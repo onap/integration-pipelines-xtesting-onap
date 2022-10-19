@@ -1,0 +1,101 @@
+---
+# tasks file for roles/prepare_test
+
+##
+# Install deps and docker
+##
+- name: Install needed packages
+  become: "yes"
+  ansible.builtin.apt:
+    name: "{{ apt_packages }}"
+    state: present
+    update_cache: yes
+
+- name: install pip dependencies
+  become: "yes"
+  ansible.builtin.pip:
+    name: "{{ item }}"
+    state: latest
+  loop: "{{ pip_packages }}"
+
+- name: retrieve linux type
+  ansible.builtin.set_fact:
+    distri: "{{ ansible_distribution.lower() }}"
+
+- name: retrieve docker apt key
+  ansible.builtin.apt_key:
+    url: "https://download.docker.com/linux/{{ distri }}/gpg"
+    id: 0EBFCD88
+    state: present
+
+- name: retrieve linux release
+  ansible.builtin.set_fact:
+    release: "{{ ansible_distribution_release.lower() }}"
+
+- name: add docker repo
+  ansible.builtin.apt_repository:
+    repo: >
+      deb [arch=amd64] https://download.docker.com/linux/{{ distri }}
+        {{ release }} stable
+    state: present
+
+- name: Wait for automatic system updates
+  become: yes
+  shell:
+    "if [ -e /bin/fuser ]; then while sudo fuser /var/lib/dpkg/lock >/dev/null \
+    2>&1; do sleep 1; done; fi;"
+  changed_when: false
+
+- name: install docker
+  become: yes
+  ansible.builtin.apt:
+    update_cache: "yes"
+    name: "docker-ce"
+    state: present
+
+- name: add login user to docker group
+  become: true
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+
+- name: create xtesting directory
+  ansible.builtin.file:
+    path: "{{ global_local_path }}"
+    state: directory
+    mode: 0755
+
+- name: copy description file
+  ansible.builtin.copy:
+    src: "vars/kube-config"
+    dest: "{{ global_local_path }}/{{ kube_conf_file }}"
+    mode: 0644
+
+##
+# Setup containers
+##
+- name: remove container
+  community.general.docker_container:
+    name: "{{ docker_base_name }}*"
+    state: absent
+
+##
+# Setup S3
+# This is done as workaround because xtesting cannot handle well push of
+# thousands of file for now.
+# checksum: sha256:https://dl.min.io/client/mc/release/linux-amd64/mc.sha256sum
+# doesn't work for now
+##
+- name: "retrieve mc (minio client)"
+  become: "yes"
+  ansible.builtin.get_url:
+    url: https://dl.min.io/client/mc/release/linux-amd64/mc
+    dest: /usr/local/bin/mc
+    mode: "0777"
+  when: use_s3 | bool
+
+- name: "set s3 alias"
+  command: "mc alias set s3 {{ s3_endpoint }} {{ s3_access_key }} {{
+  s3_secret_key }}"
+  when: use_s3 | bool

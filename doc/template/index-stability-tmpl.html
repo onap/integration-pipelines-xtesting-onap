@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+
+<head>
+    <title>Xtesting ONAP Results</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
+    <style>
+        canvas{
+            margin-bottom: 30px;
+        }
+     </style>
+</head>
+
+<body>
+    <div class='ui inverted vertical masthead center aligned segment'>
+
+        <div class="ui text container">
+            <h1 class="ui inverted header">
+                Stability testing results evolution
+            </h1>
+        </div>
+
+    </div>
+
+    <div class='ui vertical stripe segment'>
+        <div class='ui   grid container'>
+            <div class="row">
+                <div class="column">
+                    <h1 class="ui header">
+                        <i class="warehouse icon"></i>
+
+                    </h1>
+                    <div class="sub header">
+
+                        <!-- <div class="ui olive statistic">
+
+                            <div class="value">20%</div>
+                            <div class="label">last check</div>
+                        </div> -->
+                        <!-- <div class="ui olive statistic">
+                            <div class="value">
+                                <i class="{{ trend }}"></i>
+                            </div>
+                            <div class="label">trend</div>
+                        </div> -->
+                        <div class="ui tiny grey statistic">
+                            <div class="value">{{ lab_version }}</div>
+                            <div class="label">ONAP Version</div>
+                        </div>
+                        <div class="ui tiny grey statistic">
+                            <div class="value">{{ lab_owner }}</div>
+                            <div class="label">Lab owner</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+                <div class="ui vertical segment">
+                    <div class="ui middle aligned stackable grid container">
+                        <div class="row">
+                            <div class="eight wide column">
+                                <h3 class="ui header center aligned">Infra test results</h3>
+                                <div class=" column" style="  height:300px">
+                                    <canvas id="canvas_infra"></canvas>
+                                </div>
+                            </div>
+                            <div class="eight wide column">
+                                <h3 class="ui header center aligned">Healthcheck test results</h3>
+                                <div class=" column" style=" height:300px">
+                                    <canvas id="canvas_healthcheck"></canvas>
+                                </div>
+                            </div>
+                            <div class="eight wide column">
+                                <h3 class="ui header center aligned">Smoke test results</h3>
+                                <div class=" column" style=" height:300px">
+                                    <canvas id="canvas_smoke"></canvas>
+                                </div>
+                            </div>
+                            <div class="eight wide column">
+                                <h3 class="ui header center aligned">Security test results</h3>
+                                <div class=" column" style=" height:300px">
+                                    <canvas id="canvas_security"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"></script>
+    <script>
+
+        let DATA = {{ data |safe }}
+        let TEST_NAMES= ["infrastructure-healthcheck", "healthcheck","smoke-usecases", "security"]
+
+        function get_dates(data) {
+            let dates = []
+            for (const date of data){
+                dates.push(date["date"])
+            }
+            // data.forEach(element => {
+            //     dates.push(element.date)
+            // });
+            return dates
+        }
+
+        function get_tests_results(data,test_name){
+            let results = []
+        
+            for (const item of data){
+                console.log(item[test_name])
+                results.push(item[test_name])
+                
+            }
+           
+            return results
+        }
+
+        function trendlineEq(X, Y) {
+            // X : all x coordinates
+            // Y: all y coordinate
+            var x_sum = 0
+            var y_sum = 0
+
+            var N = 0;
+            var A = 0;
+            var B = 0;
+            var C = 0;
+            var D = 0;
+            var E = 0;
+            var F = 0;
+            var m = 0;
+            var b = 0;
+
+            if (X.length == Y.length) {
+
+                var N = X.length
+                console.log("N : " + N)
+
+            } else {
+
+                return console.log(" X and Y must be of the same size")
+            }
+
+            for (let i = 0; i <= N - 1; i++) {
+
+                A = A + (X[i] * Y[i])
+
+
+
+                x_sum = x_sum + X[i]
+                y_sum = y_sum + Y[i]
+
+                C = C + Math.pow(X[i], 2)
+
+            }
+            A = N * A;
+            console.log("A : " + A)
+
+            B = x_sum * y_sum
+            console.log("B : " + B)
+
+            C = N * C
+            console.log("C : " + C)
+
+            D = Math.pow(x_sum, 2)
+            console.log("D : " + D)
+
+            m = (A - B) / (C - D)
+            console.log("m : " + m)
+
+            E = y_sum
+            console.log("E : " + E)
+
+            F = m * x_sum
+            console.log("F : " + F)
+
+            b = (E - F) / N
+            console.log("b : " + b)
+
+            return [m, b]
+        }
+
+        function get_trend_line_data(X, params) {
+            let trend_line_data = []
+            for (let i = 0; i <= X.length - 1; i++) {
+                let y_param = (params[0] * X[i]) + params[1]
+                let coordinates = {
+                    x: X[i],
+                    y: y_param
+                }
+                trend_line_data.push(coordinates)
+            }
+            return trend_line_data
+        }
+
+        var x_coord = 0
+        var X_COORDS = []
+
+        DATA.forEach(element => {
+            X_COORDS.push(x_coord);
+            x_coord++
+
+        });
+
+        function generate_target_array(data, target) {
+            let target_array = []
+            for (const item of data){
+                target_array.push(target)
+            }
+            // data.forEach(element => {
+            //     target_array.push(target)
+            // });
+            return target_array
+        }
+
+        const results_infra = get_tests_results(DATA,TEST_NAMES[0])
+        const results_healthcheck = get_tests_results(DATA,TEST_NAMES[1])
+        const results_smoke = get_tests_results(DATA,TEST_NAMES[2])
+        const results_security = get_tests_results(DATA,TEST_NAMES[3])
+
+        const target_infra = generate_target_array(DATA, 75)
+        const target_healthcheck = generate_target_array(DATA, 100)
+        const target_smoke = generate_target_array(DATA, 100)
+        const target_security = generate_target_array(DATA, 100)
+
+        const params_infra = trendlineEq(X_COORDS, results_infra)
+        const params_healthcheck = trendlineEq(X_COORDS, results_healthcheck)
+        const params_smoke = trendlineEq(X_COORDS, results_smoke)
+        const params_security = trendlineEq(X_COORDS, results_security)
+
+        const trend_line_infra = get_trend_line_data(X_COORDS, params_infra)
+        const trend_line_healthcheck = get_trend_line_data(X_COORDS, params_healthcheck)
+        const trend_line_smoke = get_trend_line_data(X_COORDS, params_smoke)
+        const trend_line_security = get_trend_line_data(X_COORDS, params_security)
+
+        const labels = get_dates(DATA)
+
+        const data_infra = {
+            labels: labels,
+            datasets: [{
+                label: 'Infra results',
+                borderColor: 'rgb(255, 99, 132)',
+                data: results_infra
+            }, {
+                type: 'line',
+                label: 'Target',
+                borderColor: 'rgb(99, 255, 132)',
+                data: target_infra,
+            }, {
+                type: 'line',
+                label: 'trend',
+                borderColor: 'rgb(66, 191, 245)',
+                data: trend_line_infra,
+            }
+            ]
+
+        };
+
+        const data_healthcheck = {
+            labels: labels,
+            datasets: [{
+                label: 'healthcheck results',
+                borderColor: 'rgb(255, 99, 132)',
+                data: results_healthcheck
+            }, {
+                type: 'line',
+                label: 'Target',
+                borderColor: 'rgb(99, 255, 132)',
+                data: target_healthcheck,
+            },{
+                type: 'line',
+                label: 'trend',
+                borderColor: 'rgb(66, 191, 245)',
+                data: trend_line_healthcheck,
+            }
+        ]
+        };
+
+        const data_smoke = {
+            labels: labels,
+            datasets: [{
+                label: 'smoke results',
+                borderColor: 'rgb(255, 99, 132)',
+                data: results_smoke
+            }, {
+                type: 'line',
+                label: 'Target',
+                borderColor: 'rgb(99, 255, 132)',
+                data: target_smoke,
+            },{
+                type: 'line',
+                label: 'trend',
+                borderColor: 'rgb(66, 191, 245)',
+                data: trend_line_smoke,
+            }
+        ]
+        };
+
+        const data_security = {
+            labels: labels,
+            datasets: [{
+                label: 'security results',
+                borderColor: 'rgb(255, 99, 132)',
+                data: results_security
+            }, {
+                type: 'line',
+                label: 'Target',
+                borderColor: 'rgb(99, 255, 132)',
+                data: target_security,
+            },{
+                type: 'line',
+                label: 'trend',
+                borderColor: 'rgb(66, 191, 245)',
+                data: trend_line_security,
+            }
+        ]
+        };
+
+        var options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Value'
+                    },
+                    min: 0,
+                    max: 100,
+                    ticks: {
+                        stepSize: 10
+                    }
+                }
+            }
+        }
+
+        const config_infra = {
+            type: 'line',
+            data: data_infra,
+            options: options,
+        };
+        const config_healthcheck = {
+            type: 'line',
+            data: data_healthcheck,
+            options: options
+        };
+        const config_smoke = {
+            type: 'line',
+            data: data_smoke,
+            options: options
+        };
+        const config_security = {
+            type: 'line',
+            data: data_security,
+            options: options
+        };
+
+        //charts rendering
+
+
+        var chart_infra = new Chart(
+            document.getElementById('canvas_infra'),
+            config_infra
+        );
+
+
+        var chart_healthcheck = new Chart(
+            document.getElementById('canvas_healthcheck'),
+            config_healthcheck
+        );
+
+        var chart_smoke = new Chart(
+            document.getElementById('canvas_smoke'),
+            config_smoke
+        );
+
+        var chart_security = new Chart(
+            document.getElementById('canvas_security'),
+            config_security
+        );
+
+</script>
+</body>
+
+</html>

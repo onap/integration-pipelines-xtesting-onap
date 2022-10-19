@@ -1,0 +1,38 @@
+---
+- name: create directory for resiliency
+  ansible.builtin.file:
+    path: /tmp/resiliency
+    state: directory
+    mode: '0755'
+
+- name: Download Litmus manifest.
+  ansible.builtin.get_url:
+    url: https://litmuschaos.github.io/litmus/litmus-operator-v1.13.5.yaml
+    dest: /tmp/resiliency/litmus_manifest.yaml
+    mode: '0664'
+
+- name: Apply Litmus manifest
+  community.kubernetes.k8s:
+    state: present
+    src: /tmp/resiliency/litmus_manifest.yaml
+
+- name: Ensure litmus Chaos Operator is running
+  ansible.builtin.shell: "kubectl get pods -n litmus"
+
+- name: Download generic experiments manifest
+  ansible.builtin.get_url:
+    url: https://hub.litmuschaos.io/api/chaos/1.13.5?file=charts/generic/experiments.yaml
+    dest: /tmp/resiliency/litmus_experiments_manifest.yaml
+    mode: '0664'
+
+- name: Apply Litmus Experiment manifest
+  community.kubernetes.k8s:
+    namespace: "{{ onap_namespace }}"
+    state: present
+    src: /tmp/resiliency/litmus_experiments_manifest.yaml
+
+- name: "Copy resiliency script"
+  ansible.builtin.copy:
+    src: scripts/run_chaos_tests.sh
+    dest: /tmp/resiliency
+    mode: '755'

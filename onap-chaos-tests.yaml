@@ -1,0 +1,7 @@
+---
+- hosts: kube-master
+  vars_files:
+    - inventory/group_vars/all.yml
+  run_once: "yes"
+  roles:
+    - onap-chaos-tests

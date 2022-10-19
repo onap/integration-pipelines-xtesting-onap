@@ -1,0 +1,69 @@
+---
+- name: install pip dependencies
+  become: "yes"
+  ansible.builtin.pip:
+    name: "{{ item }}"
+    state: latest
+  loop: "{{ pip_packages_pages }}"
+
+- name: Copy template dir to Jumphost to generate pages
+  ansible.builtin.copy:
+    src: "{{ doc_path }}/template"
+    dest: "{{ doc_dir_target }}/{{ doc_path }}"
+
+- name: Copy dashboard page generator to Jumphost
+  ansible.builtin.copy:
+    src: "{{ doc_path }}/generate_status.py"
+    dest: "{{ doc_dir_target }}/{{ doc_path }}"
+
+- name: "[LEGACY] Generate pages"
+  shell: "python3 generate_status.py -p {{ node_name }} -d {{ test_result_url }} -t {{ build_tag }} -m legacy"
+  args:
+    chdir: "{{ doc_dir_target }}/{{ doc_path }}"
+  when: not use_s3 | bool
+
+- name: "[S3] Generate pages"
+  shell: "python3 generate_status.py -p {{ node_name }} -d {{ test_result_url }} -t {{ build_tag }} -m s3"
+  args:
+    chdir: "{{ doc_dir_target }}/{{ doc_path }}"
+  when: use_s3 | bool
+  register: page_generation
+
+- name: Manage additional status pages
+  block:
+    - name: Copy stability page generator to Jumphost
+      ansible.builtin.copy:
+        src: "{{ doc_path }}/generate_stability_graphs.py"
+        dest: "{{ doc_dir_target }}/{{ doc_path }}"
+
+    - name: Copy docker version page generator to Jumphost
+      ansible.builtin.copy:
+        src: "{{ doc_path }}/generate_docker_version.py"
+        dest: "{{ doc_dir_target }}/{{ doc_path }}"
+
+    - name: "Generate stability page"
+      shell: "python3 generate_stability_graphs.py -v {{ onap_version }}"
+      args:
+        chdir: "{{ doc_dir_target }}/{{ doc_path }}"
+
+    - name: "Generate docker version page"
+      shell: "python3 generate_docker_version.py"
+      args:
+        chdir: "{{ doc_dir_target }}/{{ doc_path }}"
+  when: '"daily" in pod'
+  ignore_errors: yes
+
+- name: Fetch pages
+  ansible.posix.synchronize:
+    src: "{{ doc_dir_target }}/{{ doc_path }}/*"
+    dest: "{{ doc_path }}"
+    use_ssh_args: true
+    mode: pull
+    recursive: no
+    rsync_opts:
+      - "--exclude=*.py"
+
+- name: Delete remote doc dir
+  ansible.builtin.file:
+    path: "{{ doc_dir_target }}/{{ doc_path }}"
+    state: absent

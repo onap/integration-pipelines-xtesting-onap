@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<meta charset="UTF-8">
+  <head>
+    <title>Xtesting ONAP Results</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/accordion.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/header.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/icon.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/card.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/container.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/step.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/statistic.min.css">
+    <script
+      src="https://code.jquery.com/jquery-3.1.1.min.js"
+      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/accordion.min.js"></script>
+    <script>$(function(){
+      $('.ui.accordion').accordion();});
+    </script>
+  </head>
+
+  <body>
+    <div class='ui inverted vertical masthead center aligned segment'>
+
+    <div class="ui text container">
+      <i class="large gitlab icon"></i>
+      <h1 class="ui inverted header">
+        OOM Gating: list of patchset
+      </h1>
+      <div class="meta">{{ date }}</div>
+    </div>
+    </div>
+
+    <div class="ui equal width center aligned padded grid">
+      <div class="row">
+        <div class="white column"></div>
+      </div>
+    </div>
+
+    <div class='ui vertical stripe segment'>
+      <div class='ui middle aligned stackable grid container'>
+        <div class="row">
+          <div class="column">
+            <h1 class="ui header">
+              <div class="sub header">
+
+                <div class="ui list center aligned segment">
+                  {% for patch in patchsets -%}
+                  <div class="item center aligned segment">
+                    <div class="content">
+                      <a class="link"><a href={{ patch }}/index.html><h2>{{ patch }}</h2></a></a>
+                    </div>
+                  </div>
+                  {%- endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </body>
+</html>

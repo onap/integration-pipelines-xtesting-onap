@@ -1,0 +1,63 @@
+"""Specific settings module."""  # pylint: disable=bad-whitespace
+
+######################
+#                    #
+# ONAP INPUTS DATAS  #
+#                    #
+######################
+
+
+# Variables to set logger information
+# Possible values for logging levels in onapsdk: INFO, DEBUG , WARNING, ERROR
+LOG_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "default": {
+            "class": "logging.Formatter",
+            "format": "%(asctime)s %(levelname)s %(lineno)d:%(filename)s(%(process)d) - %(message)s"
+        }
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "default"
+        },
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "formatter": "default",
+            "filename": "/var/lib/xtesting/results/{{ run_type }}/pythonsdk.debug.log",
+            "mode": "w"
+        }
+    },
+    "root": {
+        "level": "DEBUG",
+        "handlers": ["console", "file"]
+    }
+}
+CLEANUP_FLAG = False
+
+# SOCK_HTTP = "socks5h://127.0.0.1:8080"
+REPORTING_FILE_PATH = "/var/lib/xtesting/results/{{ run_type }}/reporting.html"
+K8S_REGION_TYPE = "k8s"
+TILLER_HOST = "localhost"
+K8S_CONFIG = None  # None means it will use default config (~/.kube/config)
+K8S_NAMESPACE = "onap"  # Kubernetes namespace
+K8S_ONAP_NAMESPACE = "onap"  # ONAP Kubernetes namespace
+K8S_ADDITIONAL_RESOURCES_NAMESPACE = K8S_ONAP_NAMESPACE  # Resources created on tests namespac
+ORCHESTRATION_REQUEST_TIMEOUT = 60.0 * 30  # 30 minutes in seconds
+{% if use_ingress | bool %}
+AAI_URL     = "https://aai-api.simpledemo.onap.org"
+CDS_URL     = "https://cds-blueprintsprocessor-api.simpledemo.onap.org"
+MSB_URL     = "https://msb-iag-ui.simpledemo.onap.org"
+SDC_BE_URL  = "https://sdc-be-api.simpledemo.onap.org"
+SDC_FE_URL  = "https://sdc-fe-ui.simpledemo.onap.org"
+SDNC_URL    = "https://sdnc-api.simpledemo.onap.org"
+SO_URL      = "https://so-api.simpledemo.onap.org"
+CLAMP_URL   = "https://policy-ui.simpledemo.onap.org"
+VES_URL     = "https://dcae-ves-collector-api.simpledemo.onap.org"
+DMAAP_URL   = "https://dmaap-mr-api.simpledemo.onap.org"
+{% endif %}
+

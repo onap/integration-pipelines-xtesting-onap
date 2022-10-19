@@ -1,0 +1,5 @@
+---
+- import_tasks: prepare_cnf_test.yaml
+  when: run_type == "basic_cnf"
+- import_tasks: prepare.yaml
+- import_tasks: launch.yaml

@@ -1,0 +1,47 @@
+---
+internal_check_certs_deployment:
+  apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: "integration-onap-internal-check-certs"
+    namespace: "{{ onap_namespace }}"
+  spec:
+    template:
+      spec:
+        restartPolicy: Never
+        containers:
+          - name: xtesting-onap
+            image: "{{ docker_health_k8s_image }}:{{ testing_container_tag }}"
+            imagePullPolicy: Always
+            command: ["run_tests","-t","internal_check_certs","-r"]
+            env:
+              - name: INSTALLER_TYPE
+                value: "{{ deployment_name }}"
+              - name: TEST_ENVIRONMENT
+                value: internal_job
+              - name: DEPLOY_SCENARIO
+                value: "{{ deploy_scenario }}"
+              - name: NODE_NAME
+                value: "{{ node_name }}"
+              - name: TEST_DB_URL
+                value:
+                  "{{ test_result_url }}"
+              - name: BUILD_TAG
+                value: "{{ build_tag }}"
+              - name: TAG
+                value: "{{ run_type }}"
+            volumeMounts:
+              - name: localtime
+                mountPath: /etc/localtime
+                readOnly: true
+              - name: job-save-results
+                mountPath:
+                  /var/lib/xtesting/results/
+        volumes:
+          - name: localtime
+            hostPath:
+              path: /etc/localtime
+          - name: job-save-results
+            hostPath:
+              path: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+    backoffLimit: 0

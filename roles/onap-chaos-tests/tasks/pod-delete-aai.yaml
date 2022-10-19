@@ -1,0 +1,103 @@
+---
+- name: create directory for pod delete aai scenario
+  ansible.builtin.file:
+    path: /tmp/resiliency/pod-delete-aai
+    state: directory
+    mode: '0755'
+  tags: prepare
+
+- name: Get deployments name
+  ansible.builtin.shell: kubectl get deployments -n onap | grep aai |awk '{print $1}'
+  register: deployments
+  tags: prepare
+
+- name: print grep output
+  ansible.builtin.debug:                   
+    msg: "{{deployments.stdout_lines}}"
+  
+
+- name: add labels to deployments
+  community.kubernetes.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "{{ item }}"
+        namespace: "{{ onap_namespace }}"
+        labels:
+          component: onap-aai
+      spec:
+        template:
+          metadata:
+            label:
+              component: onap-aai
+  loop: "{{deployments.stdout_lines}}"
+  tags: prepare
+
+- name: get AAI pod name
+  ansible.builtin.shell: kubectl get pods -n onap | grep aai |awk '{print $1}'
+  register: pod_list
+  tags: prepare
+  
+- name: print pod list
+  ansible.builtin.debug:                   
+    msg: "{{pod_list.stdout_lines | join(', ') }}"    
+
+- name: Prepare rbac file for pod delete aai experiment
+  ansible.builtin.template:
+    src: pod-delete-rbac.yaml.j2
+    dest: /tmp/resiliency/pod-delete-aai/pod-delete-aai-rbac.yaml
+    mode: 0600
+  tags: prepare
+
+- name: Prepare chaos file for pod delete aai experiment
+  ansible.builtin.template:
+    src: pod-delete-aai-chaos.yaml.j2
+    dest: /tmp/resiliency/pod-delete-aai/pod-delete-aai-chaos.yaml
+    mode: 0600
+  tags: prepare
+
+- name: Apply  pod delete aai rbac
+  community.kubernetes.k8s:
+    state: present
+    src: /tmp/resiliency/pod-delete-aai/pod-delete-rbac.yaml
+
+- name: Apply pod delete aai experiment
+  community.kubernetes.k8s:
+    state: present
+    src: /tmp/resiliency/pod-delete-aai/pod-delete-aai-chaos.yaml
+
+- name: wait for the end of chaos
+  run_once: true
+  community.kubernetes.k8s_info:
+    kind: ChaosEngine
+    api_version: litmuschaos.io/v1alpha1
+    name: aai-chaos
+    namespace: "{{ onap_namespace }}"
+  register: chaosengine_status
+  changed_when:
+    &chaos_test chaosengine_status is defined and
+    chaosengine_status.resources[0].status.engineStatus == "completed"
+  until: *chaos_test
+  retries: 5
+  delay: 120
+
+- name: get results
+  run_once: true
+  community.kubernetes.k8s_info:
+    kind: ChaosResult
+    api_version: litmuschaos.io/v1alpha1
+    name: aai-chaos-pod-delete
+    namespace: "{{ onap_namespace }}"
+  register: chaosresult_aai
+  changed_when:
+    &chaos_result chaosresult_aai is defined and
+     (chaosresult_aai.resources[0].status.experimentStatus.verdict == "Pass" or
+     chaosresult_aai.resources[0].status.experimentStatus.verdict == "Fail" )
+  until: *chaos_result
+  retries: 5
+  delay: 20
+- name: Print the chaos result verdict
+  ansible.builtin.debug:
+    msg: " The test is {{ chaosresult_aai.resources[0].status.experimentStatus.verdict}}-ed"

@@ -1,0 +1,8 @@
+---
+# file: webservers.yml
+- hosts: kube-master
+  run_once: "yes"
+  roles:
+    - xtesting-pages
+  vars_files:
+    - "vars/pdf.yml"

@@ -1,0 +1,3 @@
+[submodule "scripts/chained-ci-tools"]
+	path = scripts/chained-ci-tools
+	url = https://gitlab.com/Orange-OpenSource/lfn/ci_cd/chained-ci-tools.git

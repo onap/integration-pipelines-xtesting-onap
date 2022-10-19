@@ -1,0 +1,57 @@
+---
+# tasks file for roles/prepare_test
+
+##
+# Prepare config
+##
+- name: Clean directory
+  ansible.builtin.file:
+    path: "{{ exec_local_path }}"
+    state: absent
+
+- name: Create directory
+  ansible.builtin.file:
+    path: "{{ exec_local_path }}/vnf-services"
+    state: directory
+    mode: 0755
+
+- name: Create env file
+  ansible.builtin.template:
+    src: env-os.j2
+    dest: "{{ exec_local_path }}/env"
+    mode: "0644"
+
+- name: copy pythonsdk-tests configuration file
+  ansible.builtin.template:
+    src: settings.py.j2
+    dest: "{{ exec_local_path }}/settings.py"
+    mode: "0644"
+
+- name: create basic_vm configuration file
+  ansible.builtin.template:
+    src: basic_vm-service-{{ onap_version }}.yaml.j2
+    dest: "{{ exec_local_path }}/basic_vm-service.yaml"
+    mode: "0644"
+
+- name: create basic_vm_macro configuration file
+  ansible.builtin.template:
+    src: basic_vm_macro-service-{{ onap_version }}.yaml.j2
+    dest: "{{ exec_local_path }}/basic_vm_macro-service.yaml"
+    mode: "0644"
+
+- name: create directories as root
+  become: yes
+  ansible.builtin.file:
+    path: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+    state: directory
+    mode: 0755
+- name: Delete old logs
+  become: yes
+  ansible.builtin.file:
+    state: absent
+    path: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+
+- name: clean onap-vnf docker
+  community.general.docker_container:
+    name: "{{ docker_vnf_name }}-{{ run_type }}"
+    state: absent

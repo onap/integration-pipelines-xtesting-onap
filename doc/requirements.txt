@@ -1,0 +1,7 @@
+jinja2
+requests
+prettytable
+anytree
+deepdiff
+lxml
+bs4

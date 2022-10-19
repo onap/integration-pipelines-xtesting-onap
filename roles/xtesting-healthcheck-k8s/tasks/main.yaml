@@ -1,0 +1,126 @@
+---
+# tasks file for functest (tests)
+
+##
+- block:
+    - name: Clean directory
+      ansible.builtin.file:
+        path: "{{ exec_local_path }}"
+        state: absent
+
+    - name: Create directory
+      ansible.builtin.file:
+        path: "{{ exec_local_path }}"
+        state: directory
+        mode: 0755
+
+    - name: check helm version
+      command: "helm version --template {% raw %}'{{.Version}}'{% endraw %}"
+      register: helm_version
+
+    # Return of previous command will be "v3.3.4" for v3 and up and "<no value>"
+    # for version 2.
+    - name: store helm version
+      ansible.builtin.set_fact:
+        helmv3: "{{ ('<no' in helm_version.stdout) | ternary(false, true) }}"
+
+    - name: retrieve helm postgres secret
+      community.kubernetes.k8s_info:
+        api_version: v1
+        kind: Secret
+        name: "{{ postgres_secret_name }}"
+        namespace: "{{ postgres_namespace }}"
+      register: postgres_secrets
+      when: helmv3 | bool and helmv3_use_sql | bool
+
+    - name: retrieve helm postgres password
+      set_fact:
+        postgres_password: "{{
+          postgres_secrets.resources[0].data['postgresql-password'] | b64decode }}"
+      when: helmv3 | bool and helmv3_use_sql | bool
+
+    - name: generate fake postgres_url
+      set_fact:
+        postgres_url: ""
+      when: not helmv3_use_sql | bool
+
+    - name: Create env file
+      ansible.builtin.template:
+        src: env-os.j2
+        dest: "{{ exec_local_path }}/env"
+        mode: "0644"
+
+    - name: create directories as root
+      become: yes
+      ansible.builtin.file:
+        path: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+        state: directory
+        mode: 0755
+
+    - name: Delete old logs
+      become: yes
+      ansible.builtin.file:
+        state: absent
+        path: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+
+    - name: set helm deploy log folder
+      ansible.builtin.set_fact:
+        helm_deploy_logs_path: "{{ helmv3 | bool | ternary(
+          helm3_deploy_logs_path, helm2_deploy_logs_path) }}"
+
+    - name: "clean {{ docker_healthcheck_k8s_name }} docker"
+      community.general.docker_container:
+        name: "{{ docker_healthcheck_k8s_name }}"
+        state: absent
+        force_kill: yes
+
+    - name: generate pre command to run
+      ansible.builtin.set_fact:
+        command: chmod 700 /root/.kube && chmod 600 /root/.kube/config
+
+    - name: generate command to run
+      ansible.builtin.set_fact:
+        command: "{{ command }} && run_tests --test all --report"
+
+    - name: "launch {{ docker_healthcheck_k8s_name }} docker"
+      community.general.docker_container:
+        container_default_behavior: no_defaults
+        name: "{{ docker_healthcheck_k8s_name }}"
+        image: "{{ docker_health_k8s_image }}:{{ docker_health_k8s_version }}"
+        env_file: "{{ exec_local_path }}/env"
+        state: started
+        command: "/bin/bash -c '{{ command }}'"
+        recreate: yes
+        volumes: "{{ volumes_healthcheck_k8s }}"
+        etc_hosts: "{{ etc_hosts }}"
+        detach: yes
+        pull: yes
+        keep_volumes: no
+
+    - name: wait for test docker to be finished
+      community.docker.docker_container_info:
+        name: "{{ docker_healthcheck_k8s_name }}"
+      register: container_info
+      until: container_info.container.State.Status == "exited"
+      retries: "{{ run_timeout }}"
+      delay: 1
+
+    - name: "{{ docker_healthcheck_k8s_name }} has failed"
+      ansible.builtin.fail:
+        msg: "The test {{ docker_healthcheck_k8s_name }} has failed"
+      when: container_info.container.State.ExitCode != 0
+  always:
+    - name: "save {{ docker_healthcheck_k8s_name }} results for artifacts"
+      ansible.posix.synchronize:
+        src: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+        dest: "./results/{{ run_tiers }}"
+        use_ssh_args: true
+        mode: pull
+      ignore_errors: True
+      when: not use_s3 | bool
+    # temporitary work in order to wait for xtesting to handle thousands of
+    # files upload
+    - name: "push {{ docker_healthcheck_k8s_name }} results to S3"
+      command: "mc cp --recursive {{ res_local_path }}/{{ run_tiers }}/{{
+        run_type }} s3/{{ s3_raw_dst }}"
+      when: use_s3 | bool

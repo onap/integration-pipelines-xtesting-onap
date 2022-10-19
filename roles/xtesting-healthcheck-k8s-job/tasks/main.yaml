@@ -1,0 +1,51 @@
+---
+# tasks file for functest (tests)
+
+##
+- block:
+    - name: create directories as root
+      become: yes
+      file:
+        path: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+        state: directory
+        mode: 0755
+
+    - name: Delete old logs
+      become: yes
+      file:
+        state: absent
+        path: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+
+    - name: Delete healthcheck job
+      k8s:
+        state: absent
+        api: batch/v1
+        kind: Job
+        namespace: onap
+        name: "integration-onap-internal-check-certs"
+        kubeconfig:  "{{ global_local_path }}/{{ kube_conf_file }}"
+
+    - name: save internal check certs deployment to file
+      copy:
+        content: "{{ internal_check_certs_deployment | to_nice_yaml }}"
+        dest:
+          "{{ k8s_job__dir_path }}/healthcheck-internal-check-certs.yaml"
+
+    - name: start internal check certs job
+      k8s:
+        state: present
+        src: "{{ k8s_job__dir_path }}/healthcheck-internal-check-certs.yaml"
+        kubeconfig: "{{ global_local_path }}/{{ kube_conf_file }}"
+    - name: Wait until the healthcheck test is "completed"
+      wait_for:
+        timeout: "{{ run_timeout }}"
+        path: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}/xtesting.log"
+        search_regex: Result.EX_
+  always:
+    - name: "save healthcheck {{ run_type }} results for artifacts"
+      synchronize:
+        src: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+        use_ssh_args: true
+        dest: "./results/{{ run_tiers }}"
+        mode: pull
+      ignore_errors: True

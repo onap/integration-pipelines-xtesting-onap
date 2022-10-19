@@ -1,0 +1,54 @@
+{
+    "daily":
+    [
+        {
+            "onap_daily_pod4_honolulu":
+            [
+                {
+                    "date": "2021-04-06",
+                    "infra": 25,
+                    "healthcheck":88,
+                    "smoke":42,
+                    "security": 50
+
+                },
+                {
+                    "date": "2021-04-09",
+                    "infra": 25,
+                    "healthcheck":77,
+                    "smoke":14,
+                    "security": 50
+
+                },
+                {
+                    "date": "2021-04-10",
+                    "infra": 25,
+                    "healthcheck":88,
+                    "smoke":75,
+                    "security": 50
+
+                },
+                {
+                    "date": "2021-04-11",
+                    "infra": 25,
+                    "healthcheck":100,
+                    "smoke":37,
+                    "security": 50
+
+                },
+                {
+                    "date": "2021-04-12",
+                    "infra": 25,
+                    "healthcheck":88,
+                    "smoke":37,
+                    "security": 50
+
+                }
+                
+                
+            ]
+        }
+    ]
+       
+    
+}

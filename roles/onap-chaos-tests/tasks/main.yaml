@@ -1,0 +1,22 @@
+---
+# - name: Check the chaos target is defined
+#   ansible.builtin.fail:
+#     msg: "You must specify a chaos target (node_drain,...)"
+#   when: experiment_name is not defined
+#   tags: init_check
+
+- import_tasks: prepare.yaml
+  tags: prepare
+
+- import_tasks: node-drain.yaml
+  tags: node-drain
+
+- import_tasks: node-cpu-hog.yaml
+  tags: node-cpu-hog
+
+- import_tasks: node-memory-hog.yaml
+  tags: node-memory-hog
+
+- import_tasks: pod-delete-aai.yaml
+  tags: aai
+

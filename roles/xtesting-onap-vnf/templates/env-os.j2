@@ -1,0 +1,14 @@
+INSTALLER_TYPE={{ deployment_name }}
+TEST_DB_URL={{ test_result_url }}
+NODE_NAME={{ node_name }}
+BUILD_TAG={{ build_tag }}
+DEBUG=False
+OS_TEST_CLOUD={{ os_test_cloud }}
+ONAP_PYTHON_SDK_SETTINGS={{ vnf_settings }}
+{% if use_s3 | bool %}
+S3_ENDPOINT_URL={{ s3_endpoint }}
+S3_DST_URL={{ s3_dst }}
+HTTP_DST_URL={{ s3_http_url_endpoint }}
+AWS_ACCESS_KEY_ID={{ s3_access_key }}
+AWS_SECRET_ACCESS_KEY={{ s3_secret_key }}
+{% endif %}

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+
+<head>
+  <title>Docker version</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
+
+</head>
+
+<body>
+  <div class='ui inverted vertical masthead center aligned segment'>
+
+    <div class="ui text container">
+      <h1 class="ui inverted header">
+        Docker version evolution
+      </h1>
+    </div>
+
+  </div>
+
+  <div class='ui vertical stripe segment'>
+    <div class='ui   grid container'>
+      <div class="row">
+        <div class="column">
+          <h1 class="ui header">
+            <i class="warehouse icon"></i>
+
+          </h1>
+          <div class="sub header">
+
+            <!-- <div class="ui olive statistic">
+
+                            <div class="value">20%</div>
+                            <div class="label">last check</div>
+                        </div> -->
+            <!-- <div class="ui olive statistic">
+                            <div class="value">
+                                <i class=""></i>
+                            </div>
+                            <div class="label">trend</div>
+                        </div> -->
+            <div class="ui tiny grey statistic">
+              <div class="value"></div>
+              <div class="label">ONAP Version</div>
+            </div>
+            <div class="ui tiny grey statistic">
+              <div class="value"></div>
+              <div class="label">Lab owner</div>
+            </div>
+          </div>
+          <div class="ui segment">
+            <div class="ui two column very relaxed grid middle aligned">
+              <div class="column">
+                <div class="ui list">
+                  <div class="item">
+                    <i class=" green big square full icon"></i>
+                    <div style="vertical-align: middle" class="content">
+                      New version
+                    </div>
+                  </div>
+                  <div class="item">
+                    <i class=" yellow big square full icon"></i>
+                    <div style="vertical-align: middle" class="content">
+                      No version change since last official release
+                    </div>
+                  </div>
+                  <div class="item">
+                    <i class=" blue big square full icon"></i>
+                    <div style="vertical-align: middle" class="content">
+                      New component
+                    </div>
+                  </div>
+                  <div class="item">
+                    <i class=" grey big square full icon"></i>
+                    <div style="vertical-align: middle" class="content">
+                      No version change since at least two official releases
+                    </div>
+                  </div>
+                  <div class="item">
+                    <i class=" black big square outline icon"></i>
+                    <div style="vertical-align: middle" class="content">
+                      Component deleted
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="center aligned column">
+
+                <div class="row" style="margin-bottom: 15px;">
+                  <button id="green" class="ui green  button">.</button>
+                  <button id="yellow" class="ui yellow button">.</button>
+                  <button id="blue" class="ui blue  button">.</button>
+                  <button id="grey" class="ui grey  button">.</button>
+                  <button id="black" class="ui black basic  button">.</button>
+                  <button id="all" class="ui  basic button"> all </button>
+                </div>
+                <div class="row">
+                  <div class="ui input focus">
+                    <input type="text" id="search_input" onkeyup="search()" placeholder="Search...">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="ui vertical divider">
+              Filter
+            </div>
+          </div>
+          <table id="version_table" class="ui celled table">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Container</th>
+                <th>Image</th>
+                <th>Current version</th>
+              </tr>
+            </thead>
+            <tbody>
+
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+
+    /*
+    get ONAPS versions
+    add as many columns as versions
+    fill the table by adding rows
+    
+    */
+    let DATA = [{% for data_item in data %}
+    {
+      "component": "{{ data_item.component }}",
+      "container": "{{ data_item.container }}",
+      "image": "{{ data_item.image }}",
+      "current_version": "{{ data_item.current_version }}",
+      "other_version": {{ data_item.other_version | safe }},
+      "status": "{{ data_item.status  }}"
+    },
+    {% endfor %}]
+    // [
+    //   {
+    //     "component": "aaf-cass",
+    //     "container": "aaf-cass",
+    //     "image": "nexus3.onap.org:10001/onap/aaf/aaf_cass",
+    //     "current_version": "2.1.23",
+    //     "other_version": { "honolulu": "2.1.18" },
+    //     "status" : 1
+    //   },
+    //   {
+    //     "component": "aai",
+    //     "container": " 	aai",
+    //     "image": "docker.nexus.azure.onap.eu/aaionap/haproxy",
+    //     "current_version": "1.4.2",
+    //     "other_version": { "honolulu": "1.4.2" },
+    //     "status" : 0
+    //   },
+    //   {
+    //     "component": "cassandra",
+    //     "container": "cassandra",
+    //     "image": "docker.nexus.azure.onap.eu/cassandra",
+    //     "current_version": "1.0",
+    //     "other_version": {},
+    //     "status" : 2
+    //   },
+    //   {
+    //     "component": "sdnc",
+    //     "container": "sdnc",
+    //     "image": "",
+    //     "current_version": "",
+    //     "other_version": { "honolulu": "2.2" },
+    //     "status" : 3
+    //   },
+    //   {
+    //     "component": "onap-awx",
+    //     "container": "awx-web",
+    //     "image": "docker.nexus.azure.onap.eu/ansible/awx_web",
+    //     "current_version": "9.0.1",
+    //     "other_version": {
+    //       "honolulu": "2.2",
+    //       "guilin": "8.2.3",
+    //     },
+    //     "status" : ""
+    //   }
+
+    // ]
+
+
+    const TABLE = document.getElementById("version_table");
+
+    function is_empty(object) {
+      return object && Object.keys(object).length === 0 && object.constructor === Object
+    }
+
+    function add_column_to_table(column_title) {
+      //create a th for title
+      let table = document.querySelector(" #version_table>thead>tr");
+      let new_column = document.createElement("th");
+      let new_title = document.createTextNode(column_title);
+
+      table.appendChild(new_column);
+      new_column.appendChild(new_title);
+
+      //create matching td
+      /* let columns = document.getElementsByTagName("th");
+       let last_column = columns[colums.length - 1];*/
+    }
+
+    let COMPONENTS = [];
+    let CONTAINERS = [];
+    let IMAGES = [];
+    let C_VERSIONS = []; //current versions
+    let O_VERSIONS = []; //other versions
+
+    DATA.forEach(element => {
+      //sort data
+      COMPONENTS.push(element.component);
+      CONTAINERS.push(element.container);
+      IMAGES.push(element.image);
+      C_VERSIONS.push(element.current_version);
+      O_VERSIONS.push(element.other_version)
+
+
+    });
+
+    let columns_to_add = [];
+    O_VERSIONS.forEach(element => {
+
+      if (!(is_empty(element))) {
+
+        // if there are other version
+
+        // console.log(Object.keys(element).length)
+
+        for (let i = 0; i < Object.keys(element).length; i++) {
+
+          columns_to_add.push(Object.keys(element)[i])
+
+        }
+
+
+      }
+
+    })
+    versions = [...new Set(columns_to_add)]; // turn the array into a set and thus remove duplicates
+    //console.log(versions)
+
+    //construct table
+    versions.forEach(element => {
+      add_column_to_table(element)
+    })
+
+    const columns = document.getElementsByTagName("th")
+
+
+    DATA.forEach(element => {
+      //create a row for each element
+      let new_row = TABLE.insertRow(-1);
+      new_row.style.color = "white"
+      switch (element.status) {
+        case "0":
+          new_row.style.backgroundColor = "#FBBD08";
+          break;
+        case "1":
+          new_row.style.backgroundColor = "#21BA45";
+          break;
+        case "2":
+          new_row.style.backgroundColor = "#2185D0";
+          break;
+        case "3":
+          new_row.style.backgroundColor = "grey";
+          break;
+        case "4":
+          new_row.style.color = "black"
+          break;
+      }
+      for (let i = 0; i <= columns.length - 1; i++) {
+
+        // for each row create  4 base cells
+        let cell = new_row.insertCell(-1);
+
+        cell.setAttribute("class", "cell" + i);
+        if (cell.className == "cell0") {
+          let fill = document.createTextNode(element.component)
+          cell.append(fill)
+        } else if (cell.className == "cell1") {
+          let fill = document.createTextNode(element.container)
+          cell.append(fill)
+        } else if (cell.className == "cell2") {
+          let fill = document.createTextNode(element.image)
+          cell.append(fill)
+        } else if (cell.className == "cell" + 3) {
+          let fill = document.createTextNode(element.current_version)
+          cell.append(fill)
+        }
+
+        // add as many cells as versions after the base cells
+        for (let j = 3 + versions.length; j > 3; j--) {
+          let version_item = j - (columns.length - versions.length)
+          if (cell.className == "cell" + j) {
+
+            console.log(version_item)
+            let txt = element.other_version[versions[version_item]];
+            let fill = document.createTextNode(txt)
+            cell.append(fill)
+            version_item++;
+          }
+
+
+        }
+
+      }
+
+    })
+    function filter(color) {
+      console.log(color + ": cliqué")
+      let table = document.getElementById("version_table");
+      let tr = table.getElementsByTagName("tr");
+      for (let i = 1; i < tr.length; i++) {
+        tr[i].style.display = "none";
+        switch (color) {
+          case "green":
+            if (tr[i].style.backgroundColor == "rgb(33, 186, 69)") {
+              tr[i].style.display = "";
+            }
+            break;
+
+          case "yellow":
+
+            if (tr[i].style.backgroundColor == "rgb(251, 189, 8)") {
+              tr[i].style.display = "";
+            }
+            break;
+
+          case "blue":
+
+            if (tr[i].style.backgroundColor == "rgb(33, 133, 208)") {
+              tr[i].style.display = "";
+            }
+            break;
+
+          case "grey":
+
+            if (tr[i].style.backgroundColor == "grey") {
+              tr[i].style.display = "";
+            }
+            break;
+
+          case "black":
+
+            if (tr[i].style.backgroundColor == "") {
+              tr[i].style.display = "";
+            }
+            break;
+
+          case "all":
+            tr[i].style.display = "";
+
+            break;
+        }
+
+      }
+    }
+    let green_button = document.getElementById("green")
+    let yellow_button = document.getElementById("yellow")
+    let blue_button = document.getElementById("blue")
+    let grey_button = document.getElementById("grey")
+    let black_button = document.getElementById("black")
+    let all_button = document.getElementById("all")
+
+
+
+    green_button.addEventListener("click", function () { filter("green") })
+    yellow_button.addEventListener("click", function () { filter("yellow") })
+    blue_button.addEventListener("click", function () { filter("blue") })
+    grey_button.addEventListener("click", function () { filter("grey") })
+    black_button.addEventListener("click", function () { filter("black") })
+    all_button.addEventListener("click", function () { filter("all") })
+
+    function search() {
+
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("search_input");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("version_table");
+      tr = table.getElementsByTagName("tr");
+
+      // Loop through all table rows, and hide those who don't match the search query
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+
+  </script>
+</body>
+
+</html>

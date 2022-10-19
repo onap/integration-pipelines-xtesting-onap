@@ -1,0 +1,130 @@
+---
+tests:
+  - core
+
+healthcheck_secret:
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: s3-keys
+    namespace: "{{ onap_namespace }}"
+  data:
+    access-key: "{{ s3_access_key | string | b64encode }}"
+    secret-key: "{{ s3_secret_key | string | b64encode }}"
+
+healthcheck_deployment:
+  apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: "integration-onap-{{ run_type }}"
+    namespace: "{{ onap_namespace }}"
+  spec:
+    backoffLimit: 0
+    template:
+      metadata:
+        annotations:
+          sidecar.istio.io/inject: "false"
+      spec:
+        restartPolicy: Never
+        containers:
+          - name: "functest-onap-{{ run_type }}"
+            image: "{{ testing_container }}:{{ testing_container_tag }}"
+            imagePullPolicy: Always
+            env: "{{ healthcheck_deployment_env }}"
+            volumeMounts:
+              - name: localtime
+                mountPath: /etc/localtime
+                readOnly: true
+              - name: robot-eteshare
+                mountPath: /share/config
+              - name: robot-save-results
+                mountPath: /var/lib/xtesting/results/
+            command:
+              - run_tests
+            args: "{{ args }}"
+        volumes: "{{ job_volumes }}"
+
+healthcheck_deployment_env_legacy:
+  - name: INSTALLER_TYPE
+    value: "{{ deployment_name }}"
+  - name: DEPLOY_SCENARIO
+    value: "{{ deploy_scenario }}"
+  - name: NODE_NAME
+    value: "{{ node_name }}"
+  - name: TEST_DB_URL
+    value: "{{ test_result_url }}"
+  - name: BUILD_TAG
+    value: "{{ build_tag }}"
+  - name: TAG
+    value: "{{ run_type }}"
+
+healthcheck_deployment_env_s3:
+  - name: INSTALLER_TYPE
+    value: "{{ deployment_name }}"
+  - name: DEPLOY_SCENARIO
+    value: "{{ deploy_scenario }}"
+  - name: NODE_NAME
+    value: "{{ node_name }}"
+  - name: TEST_DB_URL
+    value: "{{ test_result_url }}"
+  - name: BUILD_TAG
+    value: "{{ build_tag }}"
+  - name: TAG
+    value: "{{ run_type }}"
+  - name: S3_ENDPOINT_URL
+    value: "{{ s3_internal_url }}"
+  - name: S3_DST_URL
+    value: "{{ s3_dst }}"
+  - name: HTTP_DST_URL
+    value: "{{ s3_http_url_endpoint }}"
+  - name: AWS_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        key: access-key
+        name: s3-keys
+  - name: AWS_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        key: secret-key
+        name: s3-keys
+
+healthcheck_deployment_env: "{{ use_s3 | bool |
+ternary(healthcheck_deployment_env_s3, healthcheck_deployment_env_legacy) }}"
+
+args_legacy:
+  - --test
+  - "{{ run_type }}"
+  - --report
+
+args_s3:
+  - --test
+  - "{{ run_type }}"
+  - --push
+  - --report
+
+args: "{{ use_s3 | bool | ternary(args_s3, args_legacy) }}"
+
+volumes_legacy:
+  - name: localtime
+    hostPath:
+      path: /etc/localtime
+  - name: robot-eteshare
+    configMap:
+      name: "{{ onap_namespace }}-{{ robot_configmap }}"
+      defaultMode: 0755
+  - name: robot-save-results
+    hostPath:
+      path: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+
+volumes_s3:
+  - name: localtime
+    hostPath:
+      path: /etc/localtime
+  - name: robot-eteshare
+    configMap:
+      name: "{{ onap_namespace }}-{{ robot_configmap }}"
+      defaultMode: 0755
+  - name: robot-save-results
+    emptyDir: {}
+
+job_volumes: "{{ use_s3 | bool | ternary(volumes_s3, volumes_legacy) }}"

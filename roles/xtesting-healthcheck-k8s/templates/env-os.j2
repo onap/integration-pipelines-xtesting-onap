@@ -1,0 +1,17 @@
+INSTALLER_TYPE={{ deployment_name }}
+DEPLOY_SCENARIO= {{ scenario }}
+TEST_DB_URL={{ test_result_url }}
+NODE_NAME={{ node_name }}
+BUILD_TAG={{ build_tag }}
+ONAP_IP={{ onap_ip }}
+{% if project != 'oom' %}
+DEPLOY_ENVIRONMENT='gating_component'
+CHART={{ project }}
+{% endif %}
+{% if helmv3 | bool %}
+HELM_BIN=helm3
+{% if helmv3_use_sql | bool %}
+HELM_DRIVER=sql
+HELM_DRIVER_SQL_CONNECTION_STRING={{ postgres_url }}
+{% endif %}
+{% endif %}

@@ -1,0 +1,768 @@
+---
+stages:
+  - lint
+  - prepare
+  - infrastructure-healthcheck
+  - onap-security
+  - healthcheck-1
+  - healthcheck-2
+  - smoke-usecases-1
+  - smoke-usecases-2
+  - infrastructure-healthcheck-teardown
+  - info-only
+  - onap-stability
+  - onap-resiliency
+  - deploy
+  - downstream
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  ANSIBLE_DOCKER_IMAGE: registry.gitlab.com/orange-opensource/lfn/ci_cd/docker_ansible
+  ANSIBLE_DOCKER_TAG: "2.10.6"
+  CHAINED_CI_INIT: scripts/chained-ci-tools/chained-ci-init.sh
+  use_jumphost: "True"
+
+.syntax_checking: &syntax_docker
+  extends: .syntax_checking_tags
+  stage: lint
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - when: on_success
+
+yaml_linting:
+  image: docker.nexus.azure.onap.eu/sdesbure/yamllint:latest
+  script:
+    - "yamllint \
+      .gitlab-ci.yml"
+  <<: *syntax_docker
+
+ansible_linting:
+  image: docker.nexus.azure.onap.eu/sdesbure/ansible-lint:latest
+  script:
+    - "ansible-lint -x ANSIBLE0010 \
+      roles"
+  <<: *syntax_docker
+
+.runner_tags: &runner_tags
+  image: ${ANSIBLE_DOCKER_IMAGE}:${ANSIBLE_DOCKER_TAG}
+  retry: 1
+  extends: .ansible_run_tags
+
+.security_rules: &security_rules
+  rules:
+    - if: '$PROJECT == "oom" && $CI_PIPELINE_SOURCE == "trigger"'
+      when: always
+    - if: '$PROJECT== null && $CI_PIPELINE_SOURCE == "trigger"'
+      when: always
+    - if: '$PROJECT== "" && $CI_PIPELINE_SOURCE == "trigger"'
+      when: always
+
+.fulldeploy_rules: &fulldeploy_rules
+  rules:
+    - if: '$DEPLOYMENT_TYPE == "full" && $CI_PIPELINE_SOURCE == "trigger"'
+      when: always
+
+.trigger_rules: &trigger_rules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+      when: always
+
+.weekly_rules: &weekly_rules
+  rules:
+    - if: '$pod =~ /^onap_weekly.*/'
+      when: always
+
+.onap_non_master_rules: &onap_non_master_rules
+  rules:
+    - if: '$ONAP_VERSION != "master" && $ONAP_VERSION != "jakarta" && $CI_PIPELINE_SOURCE == "trigger"'
+      when: always
+
+##
+# Generic Jobs
+##
+.get_artifact: &get_artifact
+  before_script:
+    - chmod 700 .
+    - . ./${CHAINED_CI_INIT} -a -i inventory/infra
+    - mkdir -p ./results/${run_type}
+    - ansible-galaxy install -r requirements.yaml
+  after_script:
+    - ./scripts/chained-ci-tools/clean.sh
+
+.prepare: &prepare
+  script:
+    - rm -Rf ./results && mkdir -p ./results
+    - ansible-playbook ${ansible_verbose} ${VAULT_OPT}
+      -i inventory/infra xtesting-jumphost.yaml
+  <<: *get_artifact
+  <<: *runner_tags
+
+.run_healthcheck: &run_healthcheck
+  script:
+    - ansible-playbook ${ansible_verbose} ${VAULT_OPT}
+      -i inventory/infra xtesting-healthcheck.yaml
+      --extra-vars "run_type=${run_type} run_tiers=${run_tiers} run_timeout=${run_timeout}"
+  <<: *get_artifact
+  timeout: 15 minutes
+
+.manage_artifacts: &manage_artifacts
+  artifacts:
+    paths:
+      - results/${run_tiers}/${run_type}/
+    when: always
+
+.run_infrastructure_healthcheck: &run_infrastructure_healthcheck
+  script:
+    - sleep 120
+    - ansible-playbook ${ansible_verbose} ${VAULT_OPT}
+      -i inventory/infra xtesting-healthcheck-k8s.yaml
+      --extra-vars "run_type=${run_type} run_tiers=${run_tiers} run_timeout=${run_timeout}"
+  timeout: 30 minutes
+
+.run_infrastructure_healthcheck_job: &run_infrastructure_healthcheck_job
+  script:
+    - ansible-playbook ${ansible_verbose} ${VAULT_OPT}
+      -i inventory/infra xtesting-healthcheck-k8s-job.yaml
+      --extra-vars "run_type=${run_type} run_tiers=${run_tiers} run_timeout=${run_timeout}"
+  timeout: 360 minutes
+
+.run_onap_vnf: &run_onap_vnf
+  script:
+    - ansible-playbook ${ansible_verbose} ${VAULT_OPT}
+      -i inventory/infra xtesting-onap-vnf.yaml
+      --extra-vars "run_type=${run_type} before_launch_wait_time=${before_launch_wait_time} run_tiers=${run_tiers} vnf_settings=${vnf_settings} run_timeout=${run_timeout}"
+  <<: *get_artifact
+  timeout: 90 minutes
+
+.run_smoke_usecase_robot: &run_smoke_usecase_robot
+  script:
+    - ansible-playbook ${ansible_verbose} ${VAULT_OPT}
+      -i inventory/infra xtesting-healthcheck.yaml
+      --extra-vars "run_type=${run_type} run_tiers=${run_tiers} run_timeout=${run_timeout}"
+  <<: *get_artifact
+  timeout: 30 minutes
+
+.run_onap_security: &run_onap_security
+  script:
+    - ansible-playbook ${ansible_verbose} ${VAULT_OPT}
+      -i inventory/infra xtesting-onap-security.yaml
+      --extra-vars "run_type=${run_type} run_tiers=${run_tiers} run_timeout=${run_timeout}"
+  timeout: 360 minutes
+
+.run_legal_tern: &run_legal_tern
+  script:
+    - ansible-playbook ${ansible_verbose} ${VAULT_OPT}
+      -i inventory/infra legal-tern.yaml
+      --extra-vars "run_type=${run_type} run_tiers=${run_tiers} lf_results_backup=${LF_RESULTS_BACKUP}
+       ci_pipeline_created_at=${CI_PIPELINE_CREATED_AT} "
+
+.run_onap_stability: &run_onap_stability
+  script:
+    - ansible-playbook ${ansible_verbose} ${VAULT_OPT}
+      -i inventory/infra onap-stability.yaml
+      --extra-vars "run_type=${run_type} run_tiers=${run_tiers} lf_results_backup=${LF_RESULTS_BACKUP}
+       ci_pipeline_created_at=${CI_PIPELINE_CREATED_AT} "
+
+.run_onap_resiliency: &run_onap_resiliency
+  script:
+    - ansible-playbook ${ansible_verbose} ${VAULT_OPT}
+      -i inventory/infra onap-chaos-tests.yaml
+      --tags "prepare"
+
+.infrastructure_healthcheck: &infrastructure_healthcheck
+  variables:
+    run_tiers: infrastructure-healthcheck
+    run_type: k8s
+    run_timeout: 1000
+  stage: infrastructure-healthcheck
+  allow_failure: true
+  <<: *get_artifact
+  <<: *run_infrastructure_healthcheck
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.infrastructure_healthcheck_teardown: &infrastructure_healthcheck_teardown
+  variables:
+    run_tiers: infrastructure-healthcheck
+    run_type: k8s-teardown
+    run_timeout: 700
+  stage: infrastructure-healthcheck-teardown
+  allow_failure: true
+  <<: *get_artifact
+  <<: *run_infrastructure_healthcheck
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.infrastructure_healthcheck_internal_check_certs: &infrastructure_healthcheck_internal_check_certs
+  variables:
+    run_tiers: infrastructure-healthcheck
+    run_type: internal_check_certs
+    run_timeout: 700
+  stage: infrastructure-healthcheck
+  allow_failure: true
+  <<: *get_artifact
+  <<: *run_infrastructure_healthcheck_job
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.core: &core
+  variables:
+    run_tiers: xtesting-healthcheck
+    run_type: core
+    run_timeout: 240
+  allow_failure: true
+  stage: healthcheck-1
+  <<: *get_artifact
+  <<: *run_healthcheck
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.full: &full
+  variables:
+    run_tiers: xtesting-healthcheck
+    run_type: full
+    run_timeout: 600
+  stage: healthcheck-1
+  allow_failure: true
+  <<: *get_artifact
+  <<: *run_healthcheck
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.healthdist: &healthdist
+  variables:
+    run_tiers: xtesting-healthcheck
+    run_type: healthdist
+    run_timeout: 600
+  stage: healthcheck-2
+  <<: *get_artifact
+  <<: *run_healthcheck
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.postinstall: &postinstall
+  variables:
+    run_tiers: xtesting-healthcheck
+    run_type: postinstall
+    run_timeout: 600
+  stage: healthcheck-1
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_healthcheck
+  <<: *manage_artifacts
+
+.cps_healthcheck: &cps_healthcheck
+  variables:
+    run_tiers: xtesting-healthcheck
+    run_type: cps-healthcheck
+    run_timeout: 300
+  stage: healthcheck-1
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_healthcheck
+  <<: *manage_artifacts
+
+.cps_temporal_healthcheck: &cps_temporal_healthcheck
+  variables:
+    run_tiers: xtesting-healthcheck
+    run_type: cps-temporal-healthcheck
+    run_timeout: 300
+  stage: healthcheck-1
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_healthcheck
+  <<: *manage_artifacts
+
+.cps_dmi_plugin_healthcheck: &cps_dmi_plugin_healthcheck
+  variables:
+    run_tiers: xtesting-healthcheck
+    run_type: cps-dmi-plugin-healthcheck
+    run_timeout: 300
+  stage: healthcheck-1
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_healthcheck
+  <<: *manage_artifacts
+
+.vnf_basic_vm: &vnf_basic_vm
+  variables:
+    run_tiers: smoke-usecases
+    run_type: basic_vm
+    vnf_settings: onaptests.configuration.basic_vm_settings
+    run_timeout: 2000
+    before_launch_wait_time: 120
+  stage: smoke-usecases-1
+  <<: *get_artifact
+  <<: *run_onap_vnf
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.vnf_basic_vm_macro: &vnf_basic_vm_macro
+  variables:
+    run_tiers: smoke-usecases
+    run_type: basic_vm_macro
+    vnf_settings: onaptests.configuration.basic_vm_macro_settings
+    run_timeout: 2000
+    before_launch_wait_time: 120
+  stage: smoke-usecases-2
+  <<: *get_artifact
+  <<: *run_onap_vnf
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.basic_network: &basic_network
+  variables:
+    run_tiers: smoke-usecases
+    run_type: basic_network
+    vnf_settings: onaptests.configuration.basic_network_nomulticloud_settings
+    run_timeout: 1500
+    before_launch_wait_time: 0
+  stage: smoke-usecases-1
+  <<: *get_artifact
+  <<: *run_onap_vnf
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.basic_cnf: &basic_cnf
+  variables:
+    run_tiers: smoke-usecases
+    run_type: basic_cnf
+    vnf_settings: onaptests.configuration.basic_cnf_yaml_settings
+    run_timeout: 2000
+    before_launch_wait_time: 360
+  stage: smoke-usecases-1
+  <<: *get_artifact
+  <<: *run_onap_vnf
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+# .basic_cds: &basic_cds
+#   variables:
+#     run_tiers: smoke-usecases
+#     run_type: basic_cds
+#     vnf_settings: onaptests.configuration.cba_enrichment_settings
+#     run_timeout: 1000
+#     before_launch_wait_time: 30
+#   stage: healthcheck
+#   <<: *get_artifact
+#   <<: *runner_tags
+#   <<: *run_onap_vnf
+#   <<: *manage_artifacts
+
+.basic_onboard: &basic_onboard
+  variables:
+    run_tiers: smoke-usecases
+    run_type: basic_onboard
+    vnf_settings: onaptests.configuration.basic_onboard_settings
+    run_timeout: 1200
+    before_launch_wait_time: 120
+  stage: healthcheck-2
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_onap_vnf
+  <<: *manage_artifacts
+
+
+.basic_clamp: &basic_clamp
+  variables:
+    run_tiers: smoke-usecases
+    run_type: basic_clamp
+    vnf_settings: onaptests.configuration.basic_clamp_settings
+    run_timeout: 1200
+    before_launch_wait_time: 120
+  stage: smoke-usecases-2
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_onap_vnf
+  <<: *manage_artifacts
+
+.pnf_macro: &pnf_macro
+  variables:
+    run_tiers: smoke-usecases
+    run_type: pnf_macro
+    vnf_settings: onaptests.configuration.pnf_macro_settings
+    run_timeout: 2400
+    before_launch_wait_time: 180
+  stage: smoke-usecases-2
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_onap_vnf
+  <<: *manage_artifacts
+
+.cds_resource_resolution: &cds_resource_resolution
+  variables:
+    run_tiers: smoke-usecases
+    run_type: cds_resource_resolution
+    vnf_settings: onaptests.configuration.cds_resource_resolution_settings
+    run_timeout: 1000
+    before_launch_wait_time: 180
+  stage: smoke-usecases-1
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_onap_vnf
+  <<: *manage_artifacts
+
+.basic_cnf_macro: &basic_cnf_macro
+  variables:
+    run_tiers: smoke-usecases
+    run_type: basic_cnf_macro
+    vnf_settings: onaptests.configuration.basic_cnf_macro_settings
+    run_timeout: 1000
+    before_launch_wait_time: 180
+  stage: smoke-usecases-2
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_onap_vnf
+  <<: *manage_artifacts
+
+.pnf_registrate: &pnf_registrate
+  variables:
+    run_tiers: xtesting-smoke-usecases-robot
+    run_type: pnf-registrate
+    run_timeout: 1000
+  stage: smoke-usecases-1
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_smoke_usecase_robot
+  <<: *manage_artifacts
+
+.5gbulkpm: &5gbulkpm
+  variables:
+    run_tiers: xtesting-smoke-usecases-robot
+    run_type: 5gbulkpm
+    run_timeout: 1200
+  stage: smoke-usecases-2
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_smoke_usecase_robot
+  <<: *manage_artifacts
+
+.hvves: &hvves
+  variables:
+    run_tiers: xtesting-smoke-usecases-robot
+    run_type: hv-ves
+    run_timeout: 120
+  stage: healthcheck-2
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_smoke_usecase_robot
+  <<: *manage_artifacts
+
+.vescollector: &vescollector
+  variables:
+    run_tiers: xtesting-smoke-usecases-robot
+    run_type: ves-collector
+    run_timeout: 1000
+  stage: healthcheck-2
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_smoke_usecase_robot
+  <<: *manage_artifacts
+
+.cmpv2: &cmpv2
+  variables:
+    run_tiers: xtesting-smoke-usecases-robot
+    run_type: cmpv2
+    run_timeout: 1000
+  stage: smoke-usecases-1
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_smoke_usecase_robot
+  <<: *manage_artifacts
+
+.dcaemod: &dcaemod
+  variables:
+    run_tiers: xtesting-smoke-usecases-robot
+    run_type: dcaemod
+    run_timeout: 1000
+  stage: smoke-usecases-2
+  <<: *get_artifact
+  <<: *runner_tags
+  <<: *run_smoke_usecase_robot
+  <<: *manage_artifacts
+
+.security_root_pods: &security_root_pods
+  variables:
+    run_tiers: security
+    run_type: root_pods
+    run_timeout: 700
+  stage: onap-security
+  <<: *get_artifact
+  <<: *run_onap_security
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.security_unlimitted_pods: &security_unlimitted_pods
+  variables:
+    run_tiers: security
+    run_type: unlimitted_pods
+    run_timeout: 1000
+  stage: onap-security
+  <<: *get_artifact
+  <<: *run_onap_security
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+# .security_cis_kubernetes: &security_cis_kubernetes
+#   variables:
+#     run_tiers: security
+#     run_type: cis_kubernetes
+#     run_timeout: 700
+#   stage: onap-security
+#   <<: *get_artifact
+#   <<: *run_onap_security
+#   <<: *runner_tags
+#   <<: *manage_artifacts
+
+.security_jdpw_ports: &security_jdpw_ports
+  variables:
+    run_tiers: security
+    run_type: jdpw_ports
+    run_timeout: 700
+  stage: onap-security
+  <<: *get_artifact
+  <<: *run_onap_security
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.security_kube_hunter: &security_kube_hunter
+  variables:
+    run_tiers: security
+    run_type: kube_hunter
+    run_timeout: 700
+  stage: onap-security
+  <<: *get_artifact
+  <<: *run_onap_security
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.security_nonssl_endpoints: &security_nonssl_endpoints
+  variables:
+    run_tiers: security
+    run_type: nonssl_endpoints
+    run_timeout: 700
+  stage: onap-security
+  <<: *get_artifact
+  <<: *run_onap_security
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.security_versions: &security_versions
+  variables:
+    run_tiers: security
+    run_type: versions
+    run_timeout: 3600
+  stage: onap-security
+  <<: *get_artifact
+  <<: *run_onap_security
+  <<: *runner_tags
+  <<: *manage_artifacts
+
+.legal_tern: &legal_tern
+  variables:
+    run_tiers: legal
+    run_type: tern
+  stage: info-only
+  <<: *get_artifact
+  <<: *run_legal_tern
+  <<: *runner_tags
+
+.onap_stability: &onap_stability
+  variables:
+    run_tiers: stability
+    run_type: bench
+  stage: onap-stability
+  <<: *get_artifact
+  <<: *run_onap_stability
+  <<: *runner_tags
+
+.onap_resiliency: &onap_resiliency
+  variables:
+    run_tiers: resiliency
+    run_type: bench
+  stage: onap-resiliency
+  <<: *get_artifact
+  <<: *run_onap_resiliency
+  <<: *runner_tags
+
+# triggered PODs
+prepare:
+  <<: *prepare
+  <<: *trigger_rules
+  stage: prepare
+
+infrastructure_healthcheck:
+  <<: *infrastructure_healthcheck
+  <<: *trigger_rules
+
+core:
+  <<: *core
+  <<: *trigger_rules
+
+full:
+  <<: *full
+  <<: *fulldeploy_rules
+
+healthdist:
+  <<: *healthdist
+  <<: *fulldeploy_rules
+
+postinstall:
+  <<: *postinstall
+  <<: *fulldeploy_rules
+
+cps_healthcheck:
+  <<: *cps_healthcheck
+  <<: *fulldeploy_rules
+
+cps_temporal_healthcheck:
+  <<: *cps_temporal_healthcheck
+  <<: *fulldeploy_rules
+
+cps_dmi_plugin_healthcheck:
+  <<: *cps_dmi_plugin_healthcheck
+  <<: *fulldeploy_rules
+
+vnf_basic_vm:
+  <<: *vnf_basic_vm
+  <<: *trigger_rules
+
+vnf_basic_vm_macro:
+  <<: *vnf_basic_vm_macro
+  <<: *trigger_rules
+
+basic_network:
+  <<: *basic_network
+  <<: *trigger_rules
+
+basic_cnf:
+  <<: *basic_cnf
+  <<: *trigger_rules
+
+# basic_cds:
+#   <<: *basic_cds
+#   <<: *trigger_rules
+
+basic_onboard:
+  <<: *basic_onboard
+  <<: *trigger_rules
+
+basic_clamp:
+  <<: *basic_clamp
+  <<: *trigger_rules
+  <<: *onap_non_master_rules
+
+pnf_macro:
+  <<: *pnf_macro
+  <<: *trigger_rules
+
+cds_resource_resolution:
+  <<: *cds_resource_resolution
+  <<: *trigger_rules
+
+basic_cnf_macro:
+  <<: *basic_cnf_macro
+  <<: *trigger_rules
+
+pnf_registrate:
+  <<: *pnf_registrate
+  <<: *trigger_rules
+
+5gbulkpm:
+  <<: *5gbulkpm
+  <<: *trigger_rules
+
+vescollector:
+  <<: *vescollector
+  <<: *trigger_rules
+
+hvves:
+  <<: *hvves
+  <<: *trigger_rules
+
+cmpv2:
+  <<: *cmpv2
+  <<: *trigger_rules
+
+dcaemod:
+  <<: *dcaemod
+  <<: *trigger_rules
+
+security_root_pods:
+  <<: *security_root_pods
+  <<: *security_rules
+
+security_unlimitted_pods:
+  <<: *security_unlimitted_pods
+  <<: *security_rules
+
+# security_cis_kubernetes:
+#   <<: *security_cis_kubernetes
+#   <<: *security_rules
+
+security_jdpw_ports:
+  <<: *security_jdpw_ports
+  <<: *security_rules
+  <<: *weekly_rules
+
+security_kube_hunter:
+  <<: *security_kube_hunter
+  <<: *security_rules
+
+security_nonssl_endpoints:
+  <<: *security_nonssl_endpoints
+  <<: *security_rules
+
+infrastructure_healthcheck_teardown:
+  <<: *infrastructure_healthcheck_teardown
+  <<: *trigger_rules
+
+infrastructure_healthcheck_internal_check_certs:
+  <<: *infrastructure_healthcheck_internal_check_certs
+  <<: *trigger_rules
+  <<: *weekly_rules
+
+security_versions:
+  <<: *security_versions
+  <<: *security_rules
+  <<: *weekly_rules
+
+legal_tern:
+  <<: *legal_tern
+  <<: *weekly_rules
+
+onap_stability:
+  <<: *onap_stability
+  <<: *weekly_rules
+
+onap_resiliency:
+  <<: *onap_resiliency
+  <<: *weekly_rules
+
+pages:
+  stage: deploy
+  <<: *get_artifact
+  <<: *runner_tags
+  script:
+    - if [ -z "$GERRIT_REVIEW" ]; then TARGET_DIR=$pod-$CI_JOB_ID-$(date -d${CI_PIPELINE_CREATED_AT} +'%m-%d-%Y_%H-%M'); else TARGET_DIR=$GERRIT_REVIEW-$GERRIT_PATCHSET;fi
+    - mkdir -p public/$TARGET_DIR
+    - patch_list=$(echo $(find . -regextype posix-extended -regex '^.*[0-9]{5}-[0-9]*') | sed  -e "s/ /,/g" -e "s/\.\///g")
+    - ansible-playbook ${ansible_verbose} ${VAULT_OPT}
+      -i inventory/infra ./xtesting-pages.yaml
+      --extra-vars "patch_list=$patch_list"
+    - rsync -avzh --ignore-errors ./doc/ public
+    - mv public/index* public/$TARGET_DIR
+    - mv public/daily-s* public/$TARGET_DIR
+    - rsync -avzh --ignore-errors ./results/ public/$TARGET_DIR
+    - if [ -n "$LF_RESULTS_BACKUP" ];then scripts/push_results_to_lf.sh public/$TARGET_DIR ;fi
+    - if [ -z "${S3_ENDPOINT_URL}" ]; then scripts/output_summary.sh $TARGET_DIR; fi
+  artifacts:
+    paths:
+      - public/
+    expire_in: 1 month
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+      when: always

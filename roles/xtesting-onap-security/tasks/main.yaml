@@ -1,0 +1,88 @@
+---
+# tasks file for functest (tests)
+
+##
+- block:
+    - name: Create directory
+      ansible.builtin.file:
+        path: "{{ exec_local_path }}"
+        state: directory
+        mode: 0755
+
+    - name: Create env file
+      ansible.builtin.template:
+        src: env-os.j2
+        dest: "{{ exec_local_path }}/env"
+        mode: "0644"
+
+    - name: Delete old logs
+      become: yes
+      ansible.builtin.file:
+        state: absent
+        path: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+
+    - name: "clean {{ docker_onap_security_name }} docker"
+      community.general.docker_container:
+        name: "{{ docker_onap_security_name }}-{{ run_type }}"
+        state: absent
+        force_kill: yes
+
+    - name: generate pre command to run
+      ansible.builtin.set_fact:
+        command: "mkdir -p /var/lib/xtesting/results/{{ run_type }}"
+
+    - name: generate command to run
+      ansible.builtin.set_fact:
+        command: "{{ command }} && run_tests --test {{ run_type }} --report"
+
+    - name: add S3 upload to command
+      ansible.builtin.set_fact:
+        command: "{{ command }} --push"
+      when: use_s3 | bool
+
+    - name: "launch {{ docker_onap_security_name }} docker"
+      community.general.docker_container:
+        container_default_behavior: no_defaults
+        name: "{{ docker_onap_security_name }}-{{ run_type }}"
+        image: "{{ docker_onap_security_image }}:{{ docker_onap_security_version }}"
+        env_file: "{{ exec_local_path }}/env"
+        state: started
+        command: "/bin/bash -c '{{ command }}'"
+        recreate: yes
+        pid_mode: host
+        volumes: "{{ volumes_security }}"
+        detach: true
+        pull: yes
+        keep_volumes: no
+
+    - name: wait for test docker to be finished
+      community.docker.docker_container_info:
+        name: "{{ docker_onap_security_name }}-{{ run_type }}"
+      register: container_info
+      until: container_info.container.State.Status == "exited"
+      retries: "{{ run_timeout }}"
+      delay: 1
+
+    - name: "{{ docker_onap_security_name }} has failed"
+      ansible.builtin.fail:
+        msg: "The test {{ docker_onap_security_name }} has failed"
+      when: container_info.container.State.ExitCode != 0
+  always:
+    - name: retrieve container logs
+      shell: "docker logs {{ docker_onap_security_name }}-{{ run_type }}"
+      register: container_logs
+      ignore_errors: True
+
+    - name: display container logs
+      debug:
+        msg: "{{ container_logs.stdout }}"
+      ignore_errors: True
+
+    - name: "save {{ docker_onap_security_name }} results for artifacts"
+      ansible.posix.synchronize:
+        src: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+        dest: "./results/{{ run_tiers }}"
+        use_ssh_args: true
+        mode: pull
+      ignore_errors: True
+      when: not use_s3 | bool

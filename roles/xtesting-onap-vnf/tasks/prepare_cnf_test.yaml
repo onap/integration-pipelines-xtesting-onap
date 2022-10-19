@@ -1,0 +1,86 @@
+---
+- name: Check that cloud-site service does not exist
+  community.kubernetes.k8s_service:
+    name: cloud-site
+    namespace: onap
+    state: absent
+
+- name: Expose nodePort with created cloud-site service
+  shell: kubectl -n onap expose svc so-catalog-db-adapter --name cloud-site --type=NodePort
+
+- name: Get nodePort for cloud-site service
+  community.kubernetes.k8s_info:
+    kind: service
+    namespace: onap
+    name: cloud-site
+  register: output
+
+- name: set variable for api port
+  ansible.builtin.set_fact:
+    cloudsite_port: "{{ output.resources[0].spec.ports[0].nodePort }}"
+
+- name: Get DEFAULT Cloud Site
+  ansible.builtin.uri:
+    url: "{{ so_url }}:{{ cloudsite_port }}/\
+      cloudSite/DEFAULT"
+    method: GET
+    status_code: 200
+    body_format: json
+    validate_certs: "no"
+    return_content: "yes"
+    headers:
+      authorization: Basic YnBlbDpwYXNzd29yZDEk
+      Accept: application/json
+      Cache-Control: no-cache
+  register: output
+
+- name: Add cloud site CloudRegion
+  ansible.builtin.uri:
+    url: "{{ so_url }}:{{ cloudsite_port }}/\
+      cloudSite/{{ k8sRegionID }}"
+    method: PUT
+    status_code:
+      - 200
+      - 201
+    body_format: json
+    validate_certs: "no"
+    return_content: "yes"
+    headers:
+      authorization: Basic YnBlbDpwYXNzd29yZDEk
+      Accept: application/json
+      Cache-Control: no-cache
+    body:
+      id: "{{ k8sRegionID }}"
+      region_id: "{{ k8sRegionID }}"
+      aic_version: 2.5
+      clli: "{{ datacenter_id }}"
+      orchestrator: multicloud
+      identity_service_id: DEFAULT_KEYSTONE
+      identityService: "{{ output.json.identityService }}"
+
+- name: Remove created cloud-site service with NodePort
+  community.kubernetes.k8s_service:
+    name: cloud-site
+    namespace: onap
+    state: absent
+
+- name: delete cnf namespace
+  community.kubernetes.k8s:
+    state: absent
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ cnf_namespace }}"
+
+- name: wait for cnf namespace full deletion
+  shell: |
+    set -o pipefail && kubectl get namespace |
+    grep -c {{ cnf_namespace }} || true
+  args:
+    executable: /bin/bash
+  register: kube
+  changed_when: kube.stdout  == '0'
+  until: kube.stdout  == '0'
+  retries: 600
+  delay: 1

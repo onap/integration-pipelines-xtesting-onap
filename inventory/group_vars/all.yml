@@ -1,0 +1,210 @@
+---
+### General   ###
+deployment_name: "{{ lookup('env','DEPLOYMENT')| default('oom', true) }}"
+pod: "{{ lookup('env','pod')| default('none', true) }}"
+pod_type: "{{ lookup('env','INFRA_DEPLOYMENT')| default('rancher', true) }}"
+organization: "{{ details.pod_owner | default('OPNFV') }}"
+node_name: "{{ pod }}-{{ organization }}-{{ deployment_name }}"
+build_tag: "{{ ci_name }}-functest-{{ pod_type }}-\
+  {{ pod_deployment }}-{{ deploy_frequency }}-\
+  {{ onap_version }}-{{ id_review }}-{{ id_patchset }}"
+scenario: "{{ lookup('env','DEPLOY_SCENARIO') |
+  default('onap-ftw', true) }}"
+project: "{{ lookup('env','PROJECT') | default('oom', true) }}"
+pod_deployment: baremetal
+ci_name: gitlab_ci
+deploy_scenario: onap-nofeature-noha
+pipe_id: "{{ lookup('env','CI_PIPELINE_ID') | default('64', true) }}"
+id_review: "{{ lookup('env','GERRIT_REVIEW') | default(pipe_id, true) }}"
+id_patchset: "{{ lookup('env','GERRIT_PATCHSET') |
+  default('onap', true)  }}"
+
+test_result_url: "{{ lookup('env','TEST_RESULT_DB_URL')|
+  default('http://testresults.opnfv.org/onap/api/v1/results', true) }}"
+
+onap_version: "{{ lookup('env','ONAP_VERSION') |
+  default('master', true) }}"
+
+onap_namespace: "{{ lookup('env','ONAP_NAMESPACE') |
+  default('onap', true) }}"
+
+os_test_cloud: "{{ lookup('env','OS_TEST_CLOUD') |
+  default( openstack_tenant_name, true) }}"
+
+deploy_frequency: "{{ lookup('env','FREQUENCY') | default('daily', true) }}"
+
+experimental: "{{ ((lookup('env','EXPERIMENTAL') | default('', true )) != '') |
+  ternary('-experimental', '') }}"
+
+date_unique: "{{ ansible_date_time.year ~ '-' ~ ansible_date_time.month ~ '-' ~
+ansible_date_time.day ~ '-' ~ pipe_id }}"
+
+helmv3_use_sql: "{{ lookup('env','HELM3_USE_SQL') |
+  default(False, true) }}"
+
+random_wait: "{{ lookup('env','RANDOM_WAIT') |
+  default(False, true) }}"
+
+# robot_configmap:
+#   "{{ (onap_version == 'elalto') | ternary('robot-robot-eteshare-configmap', 'robot-eteshare-configmap') }}"
+
+robot_configmap: robot-eteshare-configmap
+
+deployment_type: "{{ lookup('env','DEPLOYMENT_TYPE') |
+  default('core', true) }}"
+
+use_ingress: "{{ lookup('env', 'INGRESS') | default(False, true) }}"
+
+global_local_path: "/tmp/xtesting"
+exec_local_path: "{{ global_local_path }}/{{ run_tiers }}/{{ run_type }}"
+
+k8s_job__dir_path: "{{ ansible_user_dir }}/oom/{{ onap_version }}"
+res_local_path: "/dockerdata-nfs/{{ onap_namespace }}/integration"
+helm2_deploy_logs_path: "{{
+  ansible_user_dir }}/.helm/plugins/deploy/cache/onap/logs"
+helm3_deploy_logs_path: "{{
+  ansible_user_dir }}/.local/share/helm/plugins/deploy/cache/onap/logs"
+
+# Python and system packages
+pip_packages:
+  - docker
+  - openshift==0.11.2
+
+pip_packages_pages:
+  - requests
+  - Jinja2
+  - pysocks
+  - prettytable
+  - anytree
+  - lxml
+  - beautifulsoup4
+  - deepdiff
+
+apt_packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - software-properties-common
+  - nfs-common
+  - python3-pip
+
+#docker_registry: registry.gitlab.com/orange-opensource/lfn/onap/integration/xtesting
+docker_registry: nexus3.onap.org:10003/onap
+
+# Robot healthcheck
+testing_container: "{{ docker_registry }}/{{ run_tiers }}"
+
+testing_container_tag: "{{ onap_version }}"
+
+job_file: healthcheck.yaml
+
+# VNF
+openstack_public_net_id: "{{ lookup('env','EXT_NET') |
+  default('admin', true) }}"
+
+is_pythonsdk_tests_gating: "{{ (project == 'testsuite/pythonsdk-tests') | ternary(true, false) }}"
+docker_base_name: xtesting
+docker_vnf_name: "{{ docker_base_name }}-{{ onap_namespace }}-vnf-{{ run_type }}"
+docker_vnf_image: "{{ is_pythonsdk_tests_gating | ternary('registry.gitlab.com/orange-opensource/lfn/onap/build-integration', docker_registry + '/xtesting-smoke-usecases-pythonsdk') }}"
+#docker_vnf_version: "{{ is_pythonsdk_tests_gating | ternary(id_review + '-' + id_patchset, 'master') }}"
+docker_vnf_version: "{{ is_pythonsdk_tests_gating | ternary(id_review + '-' + id_patchset, testing_container_tag) }}"
+
+clouds_path: .config/openstack/clouds.yaml
+kube_conf_file: config
+kube_conf_path: ".kube/{{ kube_conf_file }}"
+
+onaptests_path: /usr/lib/python3.8/site-packages/onaptests
+#onaptests_path: /src/onaptests/src/onaptests
+
+volumes:
+  - "{{ exec_local_path }}/env:/var/lib/xtesting/conf/env_file"
+  - "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}:/var/lib/xtesting/results"
+  - "{{ exec_local_path }}/settings.py:{{ onaptests_path }}/configuration/settings.py"
+  - "{{ ansible_user_dir }}/{{ clouds_path }}:/root/{{ clouds_path }}"
+  - "{{ ansible_user_dir }}/{{ kube_conf_path }}:{{ onaptests_path }}/templates/artifacts/{{ kube_conf_file }}"
+  - "{{ global_local_path }}/{{ kube_conf_file }}:/root/{{ kube_conf_path }}"
+  - "{{ exec_local_path }}/basic_vm-service.yaml:{{ onaptests_path }}/templates/vnf-services/basic_vm-service.yaml"
+  - "{{ exec_local_path }}/basic_vm_macro-service.yaml:{{ onaptests_path }}/templates/vnf-services/basic_vm_macro-service.yaml"
+
+k8sRegionID: k8sregion
+datacenter_id: cruguil
+cnf_namespace: "{{ lookup('env','CNF_NAMESPACE') |
+  default('k8s', true) }}"
+
+tests_list: "{{ lookup('env','tests_list')| default('all', true) }}"
+
+postgres_namespace: helm
+postgres_svc: postgres
+minio:
+  fqdn: minio.minio
+
+# To be removed => use directly the k8s alias
+etc_hosts: >
+  {
+    "{{ use_ingress | ternary('portal-ui.simpledemo.onap.org', 'portal.api.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('vid-ui.simpledemo.onap.org', 'vid.api.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('sdc-fe-ui.simpledemo.onap.org', 'sdc.api.fe.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('sdc-be-api.simpledemo.onap.org', 'sdc.api.be.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('aai-api.simpledemo.onap.org', 'aai.api.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('aai-api.simpledemo.onap.org', 'aai.api.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('aai-sparkybe-api.simpledemo.onap.org', 'aai.api.sparky.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('so-api.simpledemo.onap.org', 'so.api.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('appc-api.simpledemo.onap.org', 'appc.api.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('sdnc-api.simpledemo.onap.org', 'sdnc.api.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('nbi-api.simpledemo.onap.org', 'nbi.api.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('msb-iag-ui.simpledemo.onap.org', 'msb.api.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('dmaap-mr-api.simpledemo.onap.org', 'mr.api.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('policy-ui.simpledemo.onap.org', 'clamp.api.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('cds-blueprintsprocessor-api.simpledemo.onap.org', 'cds-blueprintsprocessor.api.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ use_ingress | ternary('dcae-ves-collector-api.simpledemo.onap.org', 'ves-collector.api.simpledemo.onap.org') }}": "{{ oom_cluster_ip }}",
+    "{{ postgres_svc }}.{{ postgres_namespace }}": "{{ oom_cluster_ip }}",
+    "{{ minio.fqdn }}": "{{ oom_cluster_ip }}",
+  }
+
+dcae_collector_ip: 10.43.207.101
+
+# k8s healthcheck
+docker_healthcheck_k8s_name: "{{ docker_base_name }}-{{ onap_namespace }}-healthcheck-k8s"
+docker_health_k8s_image: "{{ docker_registry }}/xtesting-infra-healthcheck"
+docker_health_k8s_version: "{{ onap_version }}"
+
+volumes_security:
+  - "{{ ansible_user_dir }}/{{ kube_conf_path }}:/root/{{ kube_conf_path }}"
+  - "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}:/var/lib/xtesting/results"
+
+volumes_healthcheck_k8s: "{{ volumes_security +
+  [helm_deploy_logs_path ~ ':/onap_helm_logs'] }}"
+
+# onap-security
+docker_onap_security_name: "{{ docker_base_name }}-{{ onap_namespace }}-security-{{ run_type }}"
+docker_onap_security_image: "{{ docker_registry }}/xtesting-security"
+docker_onap_security_version: "{{ onap_version }}"
+# ONAP IP used for nodeport cert verification
+onap_ip: "{{ oom_cluster_ip }}"
+
+# Doc & pages
+doc_path: doc
+doc_dir_target: /tmp
+
+so_url: http://so.api.simpledemo.onap.org
+
+
+is_a_gating: "{{ (lookup('env','GERRIT_REVIEW') | default('', true )) != '' }}"
+gating_identifier: "{{ id_review ~ '-' ~ id_patchset ~ '-' ~ pipe_id }}"
+scheduled_identifier: "{{ pod ~ '/' ~ date_unique }}"
+
+# S3 Integration
+s3_endpoint: "{{ lookup('env','S3_ENDPOINT_URL') | default('', true) }}"
+s3_internal_url: "{{ lookup('env','S3_INTERNAL_ENDPOINT_URL') | default(s3_endpoint, true) }}"
+s3_http_url_endpoint: "{{ lookup('env','S3_HTTP_DST_URL') | default('', true) }}"
+use_s3: "{{ s3_endpoint is defined and s3_endpoint != '' }}"
+test_type: "{{ (is_a_gating | bool |
+  ternary('gating', deploy_frequency)) ~ experimental }}"
+identifier: "{{ is_a_gating | bool |
+  ternary(gating_identifier, scheduled_identifier) }}"
+s3_raw_dst: "onap/{{ test_type }}/{{ identifier }}/{{ run_type }}"
+s3_dst: "s3://{{ s3_raw_dst }}"
+s3_access_key: "{{ lookup('env','S3_ACCESS_KEY') }}"
+s3_secret_key: "{{ lookup('env','S3_SECRET_KEY') }}"
+
+lf_it_nexus_pwd: "{{ lookup('env','LF_RESULTS_BACKUP') | default('', true) }}"

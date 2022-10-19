@@ -1,0 +1,75 @@
+---
+# tasks file for functest (tests)
+
+##
+- block:
+    - name: generate pre command to run
+      ansible.builtin.set_fact:
+        command: "mkdir -p /var/lib/xtesting/results/{{ run_type }}"
+
+    - name: generate command to run
+      ansible.builtin.set_fact:
+        command: "{{ command }} && run_tests --test {{ run_type }} --report"
+
+    - name: add S3 upload to command
+      ansible.builtin.set_fact:
+        command: "{{ command }} --push"
+      when: use_s3 | bool
+
+    - name: generate a random number between 0 and 600
+      ansible.builtin.set_fact:
+        before_launch_wait_time:  "{{ 600 | random }}"
+      when: random_wait and before_launch_wait_time is not defined
+
+    - name: "wait {{ before_launch_wait_time }}s in order to allow 'sequential' tests"
+      run_once: yes
+      wait_for:
+        timeout:  "{{ before_launch_wait_time }}"
+      delegate_to: localhost
+      when: random_wait
+
+    - name: "launch onap-vnf docker for {{ run_type }}"
+      community.general.docker_container:
+        container_default_behavior: no_defaults
+        name: "{{ docker_vnf_name }}-{{ run_type }}"
+        image: "{{ docker_vnf_image }}:{{ docker_vnf_version }}"
+        env_file: "{{ exec_local_path }}/env"
+        state: started
+        command: "/bin/bash -c '{{ command }}'"
+        pull: yes
+        recreate: yes
+        volumes: "{{ volumes }}"
+        etc_hosts: "{{ etc_hosts }}"
+        detach: yes
+        keep_volumes: no
+
+    - name: wait for test docker to be finished
+      community.docker.docker_container_info:
+        name: "{{ docker_vnf_name }}-{{ run_type }}"
+      register: container_info
+      until: container_info.container.State.Status == "exited"
+      retries: "{{ run_timeout }}"
+      delay: 1
+
+    - name: "{{ run_type }} has failed"
+      ansible.builtin.fail:
+        msg: "The test {{ run_type }} has failed"
+      when: container_info.container.State.ExitCode != 0
+  always:
+    - name: retrieve container logs
+      shell: "docker logs {{ docker_vnf_name }}-{{ run_type }}"
+      register: container_logs
+      ignore_errors: True
+
+    - name: display container logs
+      debug:
+        msg: "{{ container_logs.stdout }}"
+      ignore_errors: True
+    - name: "save VNF results for artifacts"
+      ansible.posix.synchronize:
+        src: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+        dest: "./results/{{ run_tiers }}"
+        mode: pull
+        use_ssh_args: true
+      ignore_errors: True
+      when: not use_s3 | bool

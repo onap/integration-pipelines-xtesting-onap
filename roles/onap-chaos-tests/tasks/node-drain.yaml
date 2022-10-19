@@ -1,0 +1,105 @@
+---
+- name: create directory for drain scenario
+  ansible.builtin.file:
+    path: /tmp/resiliency/node-drain
+    state: directory
+    mode: '0755'
+  tags: prepare
+
+- name: Get compute node list
+  community.kubernetes.k8s_info:
+    kind: Node
+    label_selectors: "! node-role.kubernetes.io/master"
+  register: kubernetes_computer_node_list
+  tags: prepare
+
+- name: Set Fact first compute node Internal IP
+  ansible.builtin.set_fact:
+    first_node_ip: "{{ item.address }}"
+  when: "'Hostname' in item.type"
+  with_items:
+    "{{ (kubernetes_computer_node_list.resources | first).status.addresses }}"
+  tags: prepare
+
+- name: Set Compute for the drain chaos
+  ansible.builtin.set_fact:
+    compute_chaos: "{{ first_node_ip }}"
+  when: compute_chaos is not defined
+  tags: prepare
+
+- name: Prepare rbac file for drain experiment
+  ansible.builtin.template:
+    src: node-drain-rbac.yaml.j2
+    dest: /tmp/resiliency/node-drain/node-drain-rbac.yaml
+    mode: 0600
+  tags: prepare
+
+- name: Prepare chaos file for drain experiment
+  ansible.builtin.template:
+    src: node-drain-chaos.yaml.j2
+    dest: /tmp/resiliency/node-drain/node-drain-chaos.yaml
+    mode: 0600
+  tags: prepare
+
+- name: Apply drain rbac
+  community.kubernetes.k8s:
+    state: present
+    src: /tmp/resiliency/node-drain/node-drain-rbac.yaml
+  tags: apply
+
+- name: Cordon the Chosen node
+  ansible.builtin.shell: "kubectl cordon {{ compute_chaos }}"
+
+- name: Apply chaos drain experiment
+  community.kubernetes.k8s:
+    state: present
+    src: /tmp/resiliency/node-drain/node-drain-chaos.yaml
+  tags: apply
+
+- name: wait for the end of chaos
+  run_once: true
+  community.kubernetes.k8s_info:
+    kind: ChaosEngine
+    api_version: litmuschaos.io/v1alpha1
+    name: onap-chaos-drain
+    namespace: "{{ onap_namespace }}"
+  register: chaosengine_status
+  changed_when:
+    &chaos_test chaosengine_status is defined and
+    chaosengine_status.resources[0].status.engineStatus == "completed"
+  until: *chaos_test
+  retries: 5
+  delay: 120
+  tags: wait
+# - name: Print the chaos engine object
+#   ansible.builtin.debug:
+#     msg: "{{chaosengine_status.resources[0].status.engineStatus }}"
+
+
+- name: get results
+  run_once: true
+  community.kubernetes.k8s_info:
+    kind: ChaosResult
+    api_version: litmuschaos.io/v1alpha1
+    name: onap-chaos-drain-node-drain
+    namespace: "{{ onap_namespace }}"
+  register: chaosresult_drain
+  changed_when:
+    &chaos_result chaosresult_drain is defined and
+     (chaosresult_drain.resources[0].status.experimentStatus.verdict == "Pass" or
+     chaosresult_drain.resources[0].status.experimentStatus.verdict == "Fail" )
+  until: *chaos_result
+  retries: 5
+  delay: 10
+  tags: wait
+
+- name: Print the chaos result object
+  ansible.builtin.debug:
+    msg: "{{ chaosresult_drain.resources[0].status.experimentStatus.verdict}}"
+
+- name: Print the chaos result verdict
+  ansible.builtin.debug:
+    msg: " The test is {{ chaosresult_drain.resources[0].status.experimentStatus.verdict}}-ed"
+
+- name: Uncordon the Chosen node
+  ansible.builtin.shell: "kubectl uncordon {{ compute_chaos }}"

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+	<meta charset="UTF-8">
+  <head>
+    <title>Xtesting ONAP Results</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/accordion.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/header.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/icon.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/card.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/container.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/step.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/statistic.min.css">
+    <script
+      src="https://code.jquery.com/jquery-3.1.1.min.js"
+      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/accordion.min.js"></script>
+    <script>$(function(){
+      $('.ui.accordion').accordion();});
+    </script>
+  </head>
+
+  <body>
+
+    <div class='ui vertical stripe segment'>
+      <div class='ui middle aligned stackable grid container'>
+        <div class="row">
+          <div class="column">
+            <h1 class="ui header">
+              <i class="warehouse icon"></i>
+              <div class="content">ONAP Xtesting results</div>
+              <div class="sub header">
+                {% if score > 99 -%}
+                    <div class="ui olive statistic">
+                {%- elif score > 75 -%}
+                    <div class="ui orange statistic">
+                {%- else -%}
+                    <div class="ui red statistic">
+                {%- endif %}
+                  <div class="value">{{ score }}%</div>
+                  <div class="label">last check</div>
+                </div>
+                <div class="ui olive statistic">
+                  <div class="value">
+                    <i class="{{ trend }}"></i>
+                  </div>
+                  <div class="label">trend</div>
+                </div>
+		  <div class="ui tiny grey statistic">
+                    <div class="value">{{ lab_version }}</div>
+                    <div class="label">ONAP Version</div>
+      </div>
+     <div class="ui tiny grey statistic">
+ 		     <div class="value">{{ lab_owner }}</div>
+		     <div class="label">Lab owner</div>
+		  </div>
+
+      {% if "daily" in pod -%}
+      <div class="ui tiny grey statistic">
+        <a href="./index-versions.html" target="_blank">
+            <i class="tasks icon"></i>
+            <div class="label">Docker Versions</div>
+          </a>
+        </div>
+        <div class="ui tiny grey statistic">
+          <a href="./index-stability.html" target="_blank">
+            <i class="chart line icon"></i>
+            <div class="label">Stability charts</div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+      {%- endif %}
+
+		</div>
+              </div>
+            </h1>
+            <div class="ui cards">
+            {% for tier in tiers -%}
+              <div class="ui card">
+                <div class="content">
+                  <div class="header">{{ tier.name }}</div>
+                  <div class="meta">{{ date }}</div>
+                  <div class="center aligned description">
+                    {% if tier.score > 99 -%}
+                        <div class="ui green statistic">
+                    {%- elif tier.score > 75 -%}
+                        <div class="ui orange statistic">
+                    {%- else -%}
+                        <div class="ui red statistic">
+                    {%- endif %}
+                      <div class="value">{{ tier.score }}%</div>
+                      <div class="label">last check</div>
+                    </div>
+                    <div class="ui fluid accordion">
+                      <div class="title">
+                        <div class="dropdown icon"></div>
+                        Full results
+                      </div>
+                      <div class="content">
+                        <div class="ui mini vertical steps">
+                        {% for result in tier.results -%}
+                            <div class="step">
+                              {% if 'PASS' == result.result  -%}
+                                <i class="inverted green check icon"></i>
+                              {%- else -%}
+                                <i class="inverted red x icon"></i>
+                              {%- endif %}
+                                <div class="content">
+                                    {% if result.url != '' -%}
+                                      <div class="center aligned header"><a href="{{result.url}}">{{result.name}}</a></div>
+                                    {%- else -%}
+                                      <div class="center aligned header">{{result.name}}</div>
+                                    {%- endif %}
+                              </div>
+                            </div>
+                        {%- endfor %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {%- endfor %}
+    					{% if "weekly" in pod -%}
+							<div class="ui card">
+                <div class="content">
+                  <div class="header">stability</div>
+                  <div class="meta">Note: results may be uploaded after several days, be patient..</div>
+				    					<div class="step">
+												<br>
+												<div class="ui fluid accordion">
+													<div class="title">
+														<div class="dropdown icon"></div>
+														Stability results
+													</div>
+														<div class="content">
+															<div class="ui mini vertical steps">
+																<div class="step">
+				    										<div class="center aligned header"><a href="./stability/results_instantiation_10_24h//onaptests_bench.html">10 // basic_vm - 24h</a></div>
+																</div>
+																<div class="step">
+																<div class="center aligned header"><a href="./stability/results_sdc_5_24h/onaptests_bench.html">5 // basic_onboard - 24h</a></div>
+															</div>
+															</div>
+														</div>
+													</div>
+												</div>
+										</div>
+    						</div>
+                  <div class="ui card">
+                    <div class="content">
+                      <div class="header">resiliency</div>
+                      <div class="meta">Note: results may be uploaded after several days, be patient..</div>
+                          <div class="step">
+                            <br>
+                            <div class="ui fluid accordion">
+                              <div class="title">
+                                <div class="dropdown icon"></div>
+                                Resiliency results
+                              </div>
+                                <div class="content">
+                                  <div class="ui mini vertical steps">
+                                    <div class="step">
+                                    <div class="center aligned header"><a href="./resiliency/reporting_chaos.html">Resiliency page</a></div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui card">
+                      <div class="content">
+                        <div class="header">info only</div>
+                        <div class="meta">Note: results may be uploaded a day after the page is created, be patient..</div>
+                            <div class="step">
+                              <br>
+                              <div class="ui fluid accordion">
+                                <div class="title">
+                                  <div class="dropdown icon"></div>
+                                  Results
+                                </div>
+                                  <div class="content">
+                                    <div class="ui mini vertical steps">
+                                      <div class="step">
+                                      <div class="center aligned header"><a href="./legal/tern/index.html">tern - Docker SBoMs</a></div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                          </div>
+                      </div>
+                  {%- endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </body>
+</html>

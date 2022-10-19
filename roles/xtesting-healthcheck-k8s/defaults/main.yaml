@@ -1,0 +1,9 @@
+---
+postgres_secret_name: postgres-postgresql
+postgres_user: helm
+postgres_db: helm
+postgres_port: 30347
+postgres_url: "postgresql://{{
+  postgres_svc }}.{{ postgres_namespace }}:{{ postgres_port }}/{{
+  postgres_db }}?user={{ postgres_user }}&password={{
+  postgres_password }}&sslmode=disable"

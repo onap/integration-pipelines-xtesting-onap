@@ -1,0 +1,55 @@
+---
+ims:
+    tosca_file_from_SDC: service-Ims-template
+    version: "1.0"
+    subscription_type: "ims"
+    vnfs:
+        - vnf_name: Clearwater_vnf
+          heat_files_to_upload: onaptests/templates/heat-files/clearwater_ims/clearwater_ims.zip
+          vnf_parameters: [
+              {"vnf-parameter-name":"public_net_id",
+               "vnf-parameter-value":"{{ openstack_public_net_id }}"},
+              {"vnf-parameter-name":"bono_image_name",
+               "vnf-parameter-value":"Ubuntu_1404"},
+              {"vnf-parameter-name":"bono_flavor_name",
+               "vnf-parameter-value":"m1.medium"},
+              {"vnf-parameter-name":"dime_image_name",
+               "vnf-parameter-value":"Ubuntu_1404"},
+              {"vnf-parameter-name":"dime_flavor_name",
+               "vnf-parameter-value":"m1.medium"},
+              {"vnf-parameter-name":"dns_image_name",
+               "vnf-parameter-value":"Ubuntu_1404"},
+              {"vnf-parameter-name":"dns_flavor_name",
+               "vnf-parameter-value":"m1.medium"},
+              {"vnf-parameter-name":"ellis_image_name",
+               "vnf-parameter-value":"Ubuntu_1404"},
+              {"vnf-parameter-name":"ellis_flavor_name",
+               "vnf-parameter-value":"m1.medium"},
+              {"vnf-parameter-name":"homer_image_name",
+               "vnf-parameter-value":"Ubuntu_1404"},
+              {"vnf-parameter-name":"homer_flavor_name",
+               "vnf-parameter-value":"m1.medium"},
+              {"vnf-parameter-name":"robot_image_name",
+               "vnf-parameter-value":"Ubuntu_1404"},
+              {"vnf-parameter-name":"robot_flavor_name",
+               "vnf-parameter-value":"m1.medium"},
+              {"vnf-parameter-name":"sprout_image_name",
+               "vnf-parameter-value":"Ubuntu_1404"},
+              {"vnf-parameter-name":"sprout_flavor_name",
+               "vnf-parameter-value":"m1.medium"},
+              {"vnf-parameter-name":"vellum_image_name",
+               "vnf-parameter-value":"Ubuntu_1404"},
+              {"vnf-parameter-name":"vellum_flavor_name",
+               "vnf-parameter-value":"m1.medium"},
+              {"vnf-parameter-name":"dns_ip",
+               "vnf-parameter-value":"8.8.8.8"},
+              {"vnf-parameter-name": "clearwater_pub_key",
+               "vnf-parameter-value":"ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAr0If\
+62QHgf/xKzomkwBD9c1ol7edWpyG5+p9UBRE0D/bJcA5lyRpaYlcjxp3pfnN+WiVYfzjwHDjeDlyAO\
+pH2o3yrBCA9U+sU6PjhIH/BXFVkVQBY4xAmtjQnN3QCzjn8BA6PbaEt53OvvaYqtgg0yc5OOA0nyDl\
+cg/FU88I1MnhZvjTU90V4QEYKCMAyYcz6NdjGfC7PmpKIVmSWgHOdR59d5CGIRv6BnIWIBqXy+z+el\
+dbSKBrRVo/dv/H8Q0uwS6/rA2gLXeXhsQmEFZXsxwovypWm6t5hWMK/4cXA88AwylMd9xSroic398R\
+ZiO3QygZ9L7aQN2rnuAQHHOOaw=="
+              },
+              {"vnf-parameter-name":"clearwater_key_name",
+               "vnf-parameter-value":"onap_key"}]

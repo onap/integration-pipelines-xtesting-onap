@@ -1,0 +1,50 @@
+---
+- block:
+    - name: ensure secret is present
+      community.kubernetes.k8s:
+        state: present
+        src: "{{ k8s_job__dir_path }}/s3-keys-{{ run_type }}.yaml"
+        kubeconfig: "{{ global_local_path }}/{{ kube_conf_file }}"
+      when: use_s3 | bool
+
+    - name: start healthcheck job
+      community.kubernetes.k8s:
+        state: present
+        src: "{{ k8s_job__dir_path }}/healthcheck-{{ run_type }}.yaml"
+        kubeconfig: "{{ global_local_path }}/{{ kube_conf_file }}"
+
+    - name: wait for end of job
+      community.kubernetes.k8s_info:
+        kind: Job
+        name: "integration-onap-{{ run_type }}"
+        namespace: "{{ onap_namespace }}"
+      register: job_info
+      until: (job_info.resources[0].status.succeeded is defined and
+        job_info.resources[0].status.succeeded == 1) or
+        (job_info.resources[0].status.failed is defined and
+        job_info.resources[0].status.failed >= 1)
+      retries: "{{ run_timeout }}"
+      delay: 1
+
+    - name: job has failed
+      ansible.builtin.fail:
+        msg: "The job has failed"
+      when: job_info.resources[0].status.failed is defined and
+        job_info.resources[0].status.failed >= 1
+
+  always:
+    - name: "save healthcheck {{ run_type }} results for artifacts"
+      ansible.posix.synchronize:
+        src: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+        use_ssh_args: true
+        dest: "./results/{{ run_tiers }}"
+        mode: pull
+        rsync_opts:
+          - "--exclude=output.xml"
+      ignore_errors: True
+      when: not use_s3 | bool
+
+    - name: remove secret file
+      ansible.builtin.file:
+        path: "{{ k8s_job__dir_path }}/s3-keys-{{ run_type }}.yaml"
+        state: absent

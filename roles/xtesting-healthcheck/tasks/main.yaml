@@ -1,0 +1,5 @@
+---
+# tasks file for ONAP healthcheck
+
+- import_tasks: prepare.yaml
+- import_tasks: launch.yaml

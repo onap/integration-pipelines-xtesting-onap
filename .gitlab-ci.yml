@@ -1,0 +1,19 @@
+---
+variables:
+  RUNNER_TAG: <SET ME>
+
+.syntax_checking_tags:
+  tags:
+    # - shared
+    # - docker
+    # - innovation
+    - $RUNNER_TAG
+
+.ansible_run_tags:
+  tags:
+    # - docker
+    # - sina
+    - $RUNNER_TAG
+
+include:
+  - local: "gitlab-ci/base.yml"

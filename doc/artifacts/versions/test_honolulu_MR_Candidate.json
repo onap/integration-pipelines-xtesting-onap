@@ -1,0 +1,50 @@
+[
+  {
+    "container": "a1policymanagement-update-config",
+    "component": "a1policymanagement",
+    "image": "dibi/envsubst",
+    "version": "1"
+  },
+  {
+    "container": "aaf-sms-preload",
+    "component": "aaf-sms",
+    "image": "nexus3.onap.org:10001/onap/aaf/sms",
+    "version": "4.0.2"
+  },
+  {
+    "container": "aaf-sms-quorumclient",
+    "component": "aaf-sms-quorumclient",
+    "image": "nexus3.onap.org:10001/onap/aaf/smsquorumclient",
+    "version": "4.0.2"
+  },
+  {
+    "container": "aaf-sms-quorumclient",
+    "component": "aaf-sms-quorumclient",
+    "image": "nexus3.onap.org:10001/onap/aaf/smsquorumclient",
+    "version": "4.0.2"
+  },
+  {
+    "container": "filebeat-onap",
+    "component": "aai-modelloader",
+    "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+    "version": "5.5.0"
+  },
+  {
+    "container": "filebeat-onap",
+    "component": "aai-resources",
+    "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+    "version": "5.5.0"
+  },
+  {
+    "container": "oof-has-api-nginx",
+    "component": "oof-has-api",
+    "image": "docker.nexus.azure.onap.eu/bitnami/nginx",
+    "version": "1.19"
+  },
+  {
+    "container": "vnfsdk-postgres",
+    "component": "vnfsdk-postgres-replica",
+    "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+    "version": "centos8-13.2-4.6.1"
+  }
+]

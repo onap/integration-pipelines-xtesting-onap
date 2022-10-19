@@ -1,0 +1,35 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: aai-chaos
+  namespace: {{ onap_namespace }}
+spec:
+  appinfo:
+    appns: {{ onap_namespace }}
+    applabel: 'component=onap-aai'
+    appkind: 'deployment'
+  # It can be active/stop
+  engineState: 'active'
+  chaosServiceAccount: pod-delete-sa
+  experiments:
+    - name: pod-delete
+      spec:
+        components:
+          env:
+            - name: TARGET_PODS
+              value: {{ pod_list.stdout_lines | join(', ') }}
+            # set chaos duration (in sec) as desired
+            - name: TOTAL_CHAOS_DURATION
+              value: '30'
+
+            # set chaos interval (in sec) as desired
+            - name: CHAOS_INTERVAL
+              value: '10'
+              
+            # pod failures without '--force' & default terminationGracePeriodSeconds
+            - name: FORCE
+              value: 'true'
+
+             ## percentage of total pods to target
+            - name: PODS_AFFECTED_PERC
+              value: '100'

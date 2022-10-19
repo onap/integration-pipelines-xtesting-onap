@@ -1,0 +1,61 @@
+---
+- name: "Install stability tests prerequisites"
+  become: yes
+  ansible.builtin.apt:
+    name:
+      - python3-venv
+      - libssl-dev
+    state: latest
+
+- name: "Set variables for stability tests run"
+  ansible.builtin.set_fact:
+    stability_tests_output: "/tmp/stability/archives"
+    stability_tests_archives: "/tmp/stability"
+
+- name: "Delete directory with/for results"
+  ansible.builtin.file:
+    path: "{{ stability_tests_output }}"
+    state: absent
+
+- name: "Copy stability tests script"
+  ansible.builtin.copy:
+    src: scripts/run_stability_tests.sh
+    dest: "{{ ansible_user_dir }}/run_stability_tests.sh"
+    mode: '500'
+
+- name: "Copy netrc for lftool"
+  ansible.builtin.template:
+    src: .netrc.j2
+    dest: "{{ ansible_user_dir }}/.netrc"
+    mode: 0600
+
+- name: "Create directory for stability test execution"
+  ansible.builtin.file:
+    path: "{{ stability_tests_output }}"
+    state: directory
+    mode: '0755'
+    recurse: yes
+    owner: "{{ ansible_user }}"
+
+- name: "Launch stability  tests & push artifacts"
+  ansible.builtin.shell:
+    cmd: "{{ ansible_user_dir }}/run_stability_tests.sh > {{ stability_tests_output }}/run_stability.log"
+    chdir: "{{ ansible_user_dir }}"
+  environment:
+    LF_RESULTS_BACKUP: '{{ lf_results_backup }}'
+    POD: '{{ pod }}'
+    CI_PIPELINE_CREATED_AT: '{{ ci_pipeline_created_at }}'
+    STABILITY_TESTS_LOCATION: '{{ stability_tests_output }}'
+    ARCHIVES_LOCATION: '{{ stability_tests_archives }}'
+  async: 259200 # 60*60*24*3 = 3 days
+  poll: 0 # dont wait for it
+  register: stability_tests
+
+- name: "Check if stability tests are running"
+  become: no
+  async_status:
+    jid: "{{ stability_tests.ansible_job_id }}"
+  register: stability_tests_result
+  until: stability_tests_result.started
+  retries: 10
+  delay: 10

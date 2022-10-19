@@ -1,0 +1,1694 @@
+[
+    {
+      "container": "a1policymanagement-update-config",
+      "component": "a1policymanagement",
+      "image": "dibi/envsubst",
+      "version": "1"
+    },
+    {
+      "container": "a1policymanagement",
+      "component": "a1policymanagement",
+      "image": "nexus3.onap.org:10001/onap/ccsdk-oran-a1policymanagementservice",
+      "version": "1.2.3"
+    },
+    {
+      "container": "aaf-cass",
+      "component": "aaf-cass",
+      "image": "nexus3.onap.org:10001/onap/aaf/aaf_cass",
+      "version": "2.1.23"
+    },
+    {
+      "container": "aaf-cm",
+      "component": "aaf-cm",
+      "image": "nexus3.onap.org:10001/onap/aaf/aaf_core",
+      "version": "2.1.23"
+    },
+    {
+      "container": "aaf-fs",
+      "component": "aaf-fs",
+      "image": "nexus3.onap.org:10001/onap/aaf/aaf_core",
+      "version": "2.1.23"
+    },
+    {
+      "container": "aaf-gui",
+      "component": "aaf-gui",
+      "image": "nexus3.onap.org:10001/onap/aaf/aaf_core",
+      "version": "2.1.23"
+    },
+    {
+      "container": "aaf-locate",
+      "component": "aaf-locate",
+      "image": "nexus3.onap.org:10001/onap/aaf/aaf_core",
+      "version": "2.1.23"
+    },
+    {
+      "container": "aaf-oauth",
+      "component": "aaf-oauth",
+      "image": "nexus3.onap.org:10001/onap/aaf/aaf_core",
+      "version": "2.1.23"
+    },
+    {
+      "container": "aaf-service",
+      "component": "aaf-service",
+      "image": "nexus3.onap.org:10001/onap/aaf/aaf_core",
+      "version": "2.1.23"
+    },
+    {
+      "container": "aaf-sms",
+      "component": "aaf-sms",
+      "image": "nexus3.onap.org:10001/onap/aaf/sms",
+      "version": "4.0.2"
+    },
+    {
+      "container": "aaf-sms-preload",
+      "component": "aaf-sms",
+      "image": "nexus3.onap.org:10001/onap/aaf/sms",
+      "version": "4.0.2"
+    },
+    {
+      "container": "aaf-sms-quorumclient",
+      "component": "aaf-sms-quorumclient",
+      "image": "nexus3.onap.org:10001/onap/aaf/smsquorumclient",
+      "version": "4.0.2"
+    },
+    {
+      "container": "aaf-sms-quorumclient",
+      "component": "aaf-sms-quorumclient",
+      "image": "nexus3.onap.org:10001/onap/aaf/smsquorumclient",
+      "version": "4.0.2"
+    },
+    {
+      "container": "aaf-sms-quorumclient",
+      "component": "aaf-sms-quorumclient",
+      "image": "nexus3.onap.org:10001/onap/aaf/smsquorumclient",
+      "version": "4.0.2"
+    },
+    {
+      "container": "aaf-sms-vault",
+      "component": "aaf-sms-vault",
+      "image": "docker.nexus.azure.onap.eu/library/vault",
+      "version": "1.3.3"
+    },
+    {
+      "container": "aaf-sms-vault-backend",
+      "component": "aaf-sms-vault",
+      "image": "docker.nexus.azure.onap.eu/library/consul",
+      "version": "1.7.1"
+    },
+    {
+      "container": "aai",
+      "component": "aai",
+      "image": "docker.nexus.azure.onap.eu/aaionap/haproxy",
+      "version": "1.4.2"
+    },
+    {
+      "container": "aai-babel",
+      "component": "aai-babel",
+      "image": "nexus3.onap.org:10001/onap/babel",
+      "version": "1.9.1"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "aai-babel",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "aai-graphadmin",
+      "component": "aai-graphadmin",
+      "image": "nexus3.onap.org:10001/onap/aai-graphadmin",
+      "version": "1.9.1"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "aai-graphadmin",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "aai-graphadmin-job",
+      "component": "aai-graphadmin-job",
+      "image": "nexus3.onap.org:10001/onap/aai-graphadmin",
+      "version": "1.9.1"
+    },
+    {
+      "container": "aai-modelloader",
+      "component": "aai-modelloader",
+      "image": "nexus3.onap.org:10001/onap/model-loader",
+      "version": "1.9.1"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "aai-modelloader",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "aai-resources",
+      "component": "aai-resources",
+      "image": "nexus3.onap.org:10001/onap/aai-resources",
+      "version": "1.9.1"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "aai-resources",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "aai-schema-service",
+      "component": "aai-schema-service",
+      "image": "nexus3.onap.org:10001/onap/aai-schema-service",
+      "version": "1.9.2"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "aai-schema-service",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "aai-sparky-be",
+      "component": "aai-sparky-be",
+      "image": "nexus3.onap.org:10001/onap/sparky-be",
+      "version": "2.0.3"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "aai-sparky-be",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "aai-traversal",
+      "component": "aai-traversal",
+      "image": "nexus3.onap.org:10001/onap/aai-traversal",
+      "version": "1.9.1"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "aai-traversal",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "aai-traversal-job",
+      "component": "aai-traversal-job",
+      "image": "nexus3.onap.org:10001/onap/aai-traversal",
+      "version": "1.9.1"
+    },
+    {
+      "container": "awx-web",
+      "component": "onap-awx",
+      "image": "docker.nexus.azure.onap.eu/ansible/awx_web",
+      "version": "9.0.1"
+    },
+    {
+      "container": "awx-celery",
+      "component": "onap-awx",
+      "image": "docker.nexus.azure.onap.eu/ansible/awx_task",
+      "version": "9.0.1"
+    },
+    {
+      "container": "awx-rabbit",
+      "component": "onap-awx",
+      "image": "docker.nexus.azure.onap.eu/ansible/awx_rabbitmq",
+      "version": "3.7.4"
+    },
+    {
+      "container": "awx-memcached",
+      "component": "onap-awx",
+      "image": "docker.nexus.azure.onap.eu/memcached",
+      "version": "1.5.20"
+    },
+    {
+      "container": "awx-mgnt",
+      "component": "awx-mgnt",
+      "image": "docker.nexus.azure.onap.eu/ansible/awx_task",
+      "version": "9.0.1"
+    },
+    {
+      "container": "awx-postgres",
+      "component": "awx-postgres",
+      "image": "docker.nexus.azure.onap.eu/postgres",
+      "version": "10.4-alpine"
+    },
+    {
+      "container": "cassandra",
+      "component": "cassandra",
+      "image": "docker.nexus.azure.onap.eu/cassandra",
+      "version": "3.11.4"
+    },
+    {
+      "container": "cassandra",
+      "component": "cassandra",
+      "image": "docker.nexus.azure.onap.eu/cassandra",
+      "version": "3.11.4"
+    },
+    {
+      "container": "cassandra",
+      "component": "cassandra",
+      "image": "docker.nexus.azure.onap.eu/cassandra",
+      "version": "3.11.4"
+    },
+    {
+      "container": "cds-blueprints-processor",
+      "component": "cds-blueprints-processor",
+      "image": "nexus3.onap.org:10001/onap/ccsdk-blueprintsprocessor",
+      "version": "1.2.1"
+    },
+    {
+      "container": "cds-command-executor",
+      "component": "cds-command-executor",
+      "image": "nexus3.onap.org:10001/onap/ccsdk-commandexecutor",
+      "version": "1.2.1"
+    },
+    {
+      "container": "cds-db",
+      "component": "cds-db",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mariadb-galera",
+      "version": "10.5.8"
+    },
+    {
+      "container": "cds-db-metrics",
+      "component": "cds-db",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mysqld-exporter",
+      "version": "0.12.1-debian-10-r264"
+    },
+    {
+      "container": "cds-py-executor",
+      "component": "cds-py-executor",
+      "image": "nexus3.onap.org:10001/onap/ccsdk-py-executor",
+      "version": "1.2.1"
+    },
+    {
+      "container": "cds-sdc-listener",
+      "component": "cds-sdc-listener",
+      "image": "nexus3.onap.org:10001/onap/ccsdk-sdclistener",
+      "version": "1.2.1"
+    },
+    {
+      "container": "cds-ui",
+      "component": "cds-ui",
+      "image": "nexus3.onap.org:10001/onap/ccsdk-cds-ui-server",
+      "version": "1.2.1"
+    },
+    {
+      "container": "chartmuseum",
+      "component": "chartmuseum",
+      "image": "ghcr.io/helm/chartmuseum",
+      "version": "v0.13.1"
+    },
+    {
+      "container": "cli",
+      "component": "cli",
+      "image": "nexus3.onap.org:10001/onap/cli",
+      "version": "6.0.1"
+    },
+    {
+      "container": "provider",
+      "component": "onap-cmpv2-cert-provider-9c6b4f65f-2nbvq",
+      "image": "nexus3.onap.org:10001/onap/org.onap.oom.platform.cert-service.oom-certservice-k8s-external-provider",
+      "version": "2.4.0"
+    },
+    {
+      "container": "consul",
+      "component": "consul",
+      "image": "nexus3.onap.org:10001/onap/oom/consul",
+      "version": "2.1.0"
+    },
+    {
+      "container": "consul-server",
+      "component": "consul-server",
+      "image": "nexus3.onap.org:10001/onap/oom/consul",
+      "version": "2.1.0"
+    },
+    {
+      "container": "consul-server",
+      "component": "consul-server",
+      "image": "nexus3.onap.org:10001/onap/oom/consul",
+      "version": "2.1.0"
+    },
+    {
+      "container": "consul-server",
+      "component": "consul-server",
+      "image": "nexus3.onap.org:10001/onap/oom/consul",
+      "version": "2.1.0"
+    },
+    {
+      "container": "cps-core",
+      "component": "cps-core",
+      "image": "nexus3.onap.org:10001/onap/cps-and-ncmp",
+      "version": "2.0.1"
+    },
+    {
+      "container": "cps-postgres-init-update-config",
+      "component": "cps-postgres-init",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "cps-postgres-init-update-config",
+      "component": "cps-postgres-init",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "cps-temporal",
+      "component": "cps-temporal",
+      "image": "nexus3.onap.org:10001/onap/cps-temporal",
+      "version": "1.0.0"
+    },
+    {
+      "container": "cps-temporal-db",
+      "component": "cps-temporal-db",
+      "image": "docker.nexus.azure.onap.eu/timescale/timescaledb",
+      "version": "2.1.1-pg13"
+    },
+    {
+      "container": "dbc-pg",
+      "component": "dbc-pg-primary",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "dbc-pg",
+      "component": "dbc-pg-replica",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "dcae-bootstrap",
+      "component": "dcae-bootstrap",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.deployments.k8s-bootstrap-container",
+      "version": "3.3.5"
+    },
+    {
+      "container": "dcae-cloudify-manager",
+      "component": "dcae-cloudify-manager",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.deployments.cm-container",
+      "version": "4.6.1"
+    },
+    {
+      "container": "dcae-config-binding-service",
+      "component": "dcae-config-binding-service",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.platform.configbinding",
+      "version": "2.5.4"
+    },
+    {
+      "container": "dcae-config-binding-service-fb-onap",
+      "component": "dcae-config-binding-service",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "dcae-config-binding-service-insecure",
+      "component": "dcae-config-binding-service",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.platform.configbinding",
+      "version": "2.5.4"
+    },
+    {
+      "container": "dcae-config-binding-service-fb-onap-i",
+      "component": "dcae-config-binding-service",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "dcae-dashboard",
+      "component": "dcae-dashboard",
+      "image": "nexus3.onap.org:10001/onap/org.onap.ccsdk.dashboard.ccsdk-app-os",
+      "version": "1.4.4"
+    },
+    {
+      "container": "dcae-dashboard-filebeat",
+      "component": "dcae-dashboard",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "dcae-dashboard-pg",
+      "component": "dcae-dashboard-pg-primary",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "dcae-dashboard-pg",
+      "component": "dcae-dashboard-pg-replica",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "dcae-db",
+      "component": "dcae-db-primary",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "dcae-db",
+      "component": "dcae-db-replica",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "dcae-deployment-handler",
+      "component": "dcae-deployment-handler",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.platform.deployment-handler",
+      "version": "4.4.1"
+    },
+    {
+      "container": "dcae-deployment-handler-filebeat",
+      "component": "dcae-deployment-handler",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "dcae-healthcheck",
+      "component": "dcae-healthcheck",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.deployments.healthcheck-container",
+      "version": "2.2.0"
+    },
+    {
+      "container": "dcae-hv-ves-collector",
+      "component": "dcae-hv-ves-collector",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.collectors.hv-ves.hv-collector-main",
+      "version": "1.9.1"
+    },
+    {
+      "container": "filebeat",
+      "component": "dcae-hv-ves-collector",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "dcae-inv-pg",
+      "component": "dcae-inv-pg-primary",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "dcae-inv-pg",
+      "component": "dcae-inv-pg-replica",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "dcae-inventory-api",
+      "component": "dcae-inventory-api",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.platform.inventory-api",
+      "version": "3.5.2"
+    },
+    {
+      "container": "dcae-inventory-api-filebeat",
+      "component": "dcae-inventory-api",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "dcae-mongo",
+      "component": "dcae-mongo",
+      "image": "docker.nexus.azure.onap.eu/library/mongo",
+      "version": "4.0.8"
+    },
+    {
+      "container": "dcae-ms-healthcheck",
+      "component": "dcae-ms-healthcheck",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.deployments.healthcheck-container",
+      "version": "2.2.0"
+    },
+    {
+      "container": "dcae-policy-handler",
+      "component": "dcae-policy-handler",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.platform.policy-handler",
+      "version": "5.1.3"
+    },
+    {
+      "container": "dcae-policy-handler-filebeat",
+      "component": "dcae-policy-handler",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "dcae-prh",
+      "component": "dcae-prh",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.services.prh.prh-app-server",
+      "version": "1.7.1"
+    },
+    {
+      "container": "filebeat",
+      "component": "dcae-prh",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "dcae-servicechange-handler",
+      "component": "dcae-servicechange-handler",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.platform.servicechange-handler",
+      "version": "1.4.0"
+    },
+    {
+      "container": "dcae-tcagen2",
+      "component": "dcae-tcagen2",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.analytics.tca-gen2.dcae-analytics-tca-web",
+      "version": "1.3.1"
+    },
+    {
+      "container": "filebeat",
+      "component": "dcae-tcagen2",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "dcae-ves-collector",
+      "component": "dcae-ves-collector",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.collectors.ves.vescollector",
+      "version": "1.10.1"
+    },
+    {
+      "container": "filebeat",
+      "component": "dcae-ves-collector",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "dcae-ves-openapi-manager",
+      "component": "dcae-ves-openapi-manager",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.platform.ves-openapi-manager",
+      "version": "1.0.1"
+    },
+    {
+      "container": "dcaemod-db",
+      "component": "dcaemod-db-primary",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "dcaemod-db",
+      "component": "dcaemod-db-replica",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "dcaemod-designtool",
+      "component": "dcaemod-designtool",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.platform.mod.designtool-web",
+      "version": "1.0.2"
+    },
+    {
+      "container": "dcaemod-distributor-api",
+      "component": "dcaemod-distributor-api",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.platform.mod.distributorapi",
+      "version": "1.1.0"
+    },
+    {
+      "container": "dcaemod-genprocessor",
+      "component": "dcaemod-genprocessor",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.platform.mod.genprocessor-job",
+      "version": "1.0.2"
+    },
+    {
+      "container": "dcaemod-genprocessor-http",
+      "component": "dcaemod-genprocessor",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.platform.mod.genprocessor-http",
+      "version": "1.0.2"
+    },
+    {
+      "container": "dcaemod-healthcheck",
+      "component": "dcaemod-healthcheck",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.deployments.healthcheck-container",
+      "version": "2.2.0"
+    },
+    {
+      "container": "dcaemod-nifi-registry",
+      "component": "dcaemod-nifi-registry",
+      "image": "docker.nexus.azure.onap.eu/apache/nifi-registry",
+      "version": "0.5.0"
+    },
+    {
+      "container": "dcaemod-onboarding-api",
+      "component": "dcaemod-onboarding-api",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.platform.mod.onboardingapi",
+      "version": "2.12.5"
+    },
+    {
+      "container": "dcaemod-runtime-api",
+      "component": "dcaemod-runtime-api",
+      "image": "nexus3.onap.org:10001/onap/org.onap.dcaegen2.platform.mod.runtime-web",
+      "version": "1.2.3"
+    },
+    {
+      "container": "dmaap-bc",
+      "component": "dmaap-bc",
+      "image": "nexus3.onap.org:10001/onap/dmaap/dmaap-bc",
+      "version": "2.0.8"
+    },
+    {
+      "container": "dmaap-provisioning-job",
+      "component": "dmaap-bc",
+      "image": "nexus3.onap.org:10001/onap/dmaap/dbc-client",
+      "version": "1.0.9"
+    },
+    {
+      "container": "dmaap-provisioning-job",
+      "component": "dmaap-bc",
+      "image": "nexus3.onap.org:10001/onap/dmaap/dbc-client",
+      "version": "1.0.9"
+    },
+    {
+      "container": "dmaap-provisioning-job",
+      "component": "dmaap-bc",
+      "image": "nexus3.onap.org:10001/onap/dmaap/dbc-client",
+      "version": "1.0.9"
+    },
+    {
+      "container": "dmaap-dr-mariadb-init",
+      "component": "dmaap-dr-mariadb-init",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mariadb",
+      "version": "10.5.8"
+    },
+    {
+      "container": "dmaap-dr-node",
+      "component": "dmaap-dr-node",
+      "image": "nexus3.onap.org:10001/onap/dmaap/datarouter-node",
+      "version": "2.1.9"
+    },
+    {
+      "container": "dmaap-dr-node-filebeat-onap",
+      "component": "dmaap-dr-node",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "dmaap-dr-prov",
+      "component": "dmaap-dr-prov",
+      "image": "nexus3.onap.org:10001/onap/dmaap/datarouter-prov",
+      "version": "2.1.9"
+    },
+    {
+      "container": "dmaap-dr-prov-filebeat-onap",
+      "component": "dmaap-dr-prov",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "ejbca-ejbca",
+      "component": "ejbca",
+      "image": "docker.nexus.azure.onap.eu/primekey/ejbca-ce",
+      "version": "7.4.3.2"
+    },
+    {
+      "container": "ejbca-config",
+      "component": "ejbca-config",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mariadb",
+      "version": "10.5.8"
+    },
+    {
+      "container": "holmes-engine-mgmt",
+      "component": "holmes-engine-mgmt",
+      "image": "nexus3.onap.org:10001/onap/holmes/engine-management",
+      "version": "9.0.0"
+    },
+    {
+      "container": "holmes-pg",
+      "component": "holmes-pg-primary",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "holmes-pg",
+      "component": "holmes-pg-replica",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "holmes-rule-mgmt",
+      "component": "holmes-rule-mgmt",
+      "image": "nexus3.onap.org:10001/onap/holmes/rule-management",
+      "version": "9.0.1"
+    },
+    {
+      "container": "kube2msb",
+      "component": "kube2msb",
+      "image": "nexus3.onap.org:10001/onap/oom/kube2msb",
+      "version": "1.2.6"
+    },
+    {
+      "container": "mariadb-galera",
+      "component": "mariadb-galera",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mariadb-galera",
+      "version": "10.5.8"
+    },
+    {
+      "container": "mariadb-galera-metrics",
+      "component": "mariadb-galera",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mysqld-exporter",
+      "version": "0.12.1-debian-10-r264"
+    },
+    {
+      "container": "mariadb-galera",
+      "component": "mariadb-galera",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mariadb-galera",
+      "version": "10.5.8"
+    },
+    {
+      "container": "mariadb-galera-metrics",
+      "component": "mariadb-galera",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mysqld-exporter",
+      "version": "0.12.1-debian-10-r264"
+    },
+    {
+      "container": "mariadb-galera",
+      "component": "mariadb-galera",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mariadb-galera",
+      "version": "10.5.8"
+    },
+    {
+      "container": "mariadb-galera-metrics",
+      "component": "mariadb-galera",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mysqld-exporter",
+      "version": "0.12.1-debian-10-r264"
+    },
+    {
+      "container": "message-router",
+      "component": "message-router",
+      "image": "nexus3.onap.org:10001/onap/dmaap/dmaap-mr",
+      "version": "1.3.0"
+    },
+    {
+      "container": "message-router-kafka",
+      "component": "message-router-kafka",
+      "image": "nexus3.onap.org:10001/onap/dmaap/kafka111",
+      "version": "1.1.1"
+    },
+    {
+      "container": "message-router-kafka",
+      "component": "message-router-kafka",
+      "image": "nexus3.onap.org:10001/onap/dmaap/kafka111",
+      "version": "1.1.1"
+    },
+    {
+      "container": "message-router-kafka",
+      "component": "message-router-kafka",
+      "image": "nexus3.onap.org:10001/onap/dmaap/kafka111",
+      "version": "1.1.1"
+    },
+    {
+      "container": "message-router-zookeeper",
+      "component": "message-router-zookeeper",
+      "image": "nexus3.onap.org:10001/onap/dmaap/zookeeper",
+      "version": "6.1.0"
+    },
+    {
+      "container": "message-router-zookeeper",
+      "component": "message-router-zookeeper",
+      "image": "nexus3.onap.org:10001/onap/dmaap/zookeeper",
+      "version": "6.1.0"
+    },
+    {
+      "container": "message-router-zookeeper",
+      "component": "message-router-zookeeper",
+      "image": "nexus3.onap.org:10001/onap/dmaap/zookeeper",
+      "version": "6.1.0"
+    },
+    {
+      "container": "modeling-etsicatalog",
+      "component": "modeling-etsicatalog",
+      "image": "nexus3.onap.org:10001/onap/modeling/etsicatalog",
+      "version": "1.0.11"
+    },
+    {
+      "container": "modeling-etsicatalog-filebeat-onap",
+      "component": "modeling-etsicatalog",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "modeling-etsicatalog",
+      "component": "modeling-etsicatalog",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mariadb",
+      "version": "10.5.8"
+    },
+    {
+      "container": "msb-consul",
+      "component": "msb-consul",
+      "image": "docker.nexus.azure.onap.eu/library/consul",
+      "version": "1.4.3"
+    },
+    {
+      "container": "msb-discovery",
+      "component": "msb-discovery",
+      "image": "nexus3.onap.org:10001/onap/msb/msb_discovery",
+      "version": "1.3.0"
+    },
+    {
+      "container": "msb-discovery-filebeat-onap",
+      "component": "msb-discovery",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "msb-eag",
+      "component": "msb-eag",
+      "image": "nexus3.onap.org:10001/onap/msb/msb_apigateway",
+      "version": "1.3.1"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "msb-eag",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "msb-iag",
+      "component": "msb-iag",
+      "image": "nexus3.onap.org:10001/onap/msb/msb_apigateway",
+      "version": "1.3.1"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "msb-iag",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "multicloud",
+      "component": "multicloud",
+      "image": "nexus3.onap.org:10001/onap/multicloud/framework",
+      "version": "1.7.1"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "multicloud",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "multicloud-fcaps",
+      "component": "multicloud-fcaps",
+      "image": "nexus3.onap.org:10001/onap/multicloud/openstack-fcaps",
+      "version": "1.5.6"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "multicloud-fcaps",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "rabbit-mq",
+      "component": "multicloud-fcaps",
+      "image": "nexus3.onap.org:10001/rabbitmq",
+      "version": "alpine"
+    },
+    {
+      "container": "multicloud-k8s",
+      "component": "multicloud-k8s",
+      "image": "nexus3.onap.org:10001/onap/multicloud/k8s",
+      "version": "0.9.3"
+    },
+    {
+      "container": "framework-artifactbroker",
+      "component": "multicloud-k8s",
+      "image": "nexus3.onap.org:10001/onap/multicloud/framework-artifactbroker",
+      "version": "1.7.1"
+    },
+    {
+      "container": "multicloud-k8s-etcd",
+      "component": "multicloud-k8s-etcd",
+      "image": "docker.nexus.azure.onap.eu/etcd-amd64",
+      "version": "3.2.24"
+    },
+    {
+      "container": "multicloud-k8s-mongo",
+      "component": "multicloud-k8s-mongo",
+      "image": "docker.nexus.azure.onap.eu/library/mongo",
+      "version": "4.0.8"
+    },
+    {
+      "container": "multicloud-pike",
+      "component": "multicloud-pike",
+      "image": "nexus3.onap.org:10001/onap/multicloud/openstack-pike",
+      "version": "1.5.6"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "multicloud-pike",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "nbi",
+      "component": "nbi",
+      "image": "nexus3.onap.org:10001/onap/externalapi/nbi",
+      "version": "8.0.1"
+    },
+    {
+      "container": "nbi-config",
+      "component": "nbi-config",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mariadb",
+      "version": "10.5.8"
+    },
+    {
+      "container": "nbi-mongo",
+      "component": "nbi-mongo",
+      "image": "docker.nexus.azure.onap.eu/library/mongo",
+      "version": "4.0.8"
+    },
+    {
+      "container": "ncmp-dmi-plugin",
+      "component": "ncmp-dmi-plugin",
+      "image": "nexus3.onap.org:10001/onap/ncmp-dmi-plugin",
+      "version": "1.0.0"
+    },
+    {
+      "container": "nengdb-init",
+      "component": "nengdb-init",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mariadb",
+      "version": "10.5.8"
+    },
+    {
+      "container": "netbox-app",
+      "component": "netbox-app",
+      "image": "docker.nexus.azure.onap.eu/netboxcommunity/netbox",
+      "version": "v2.5.8"
+    },
+    {
+      "container": "netbox-app-provisioning-job",
+      "component": "netbox-app-provisioning-job",
+      "image": "docker.nexus.azure.onap.eu/curlimages/curl",
+      "version": "7.69.1"
+    },
+    {
+      "container": "netbox-app-provisioning-job",
+      "component": "netbox-app-provisioning-job",
+      "image": "docker.nexus.azure.onap.eu/curlimages/curl",
+      "version": "7.69.1"
+    },
+    {
+      "container": "netbox-nginx",
+      "component": "netbox-nginx",
+      "image": "docker.nexus.azure.onap.eu/nginx",
+      "version": "1.15-alpine"
+    },
+    {
+      "container": "netbox-postgres",
+      "component": "netbox-postgres",
+      "image": "docker.nexus.azure.onap.eu/postgres",
+      "version": "10.4-alpine"
+    },
+    {
+      "container": "network-name-gen",
+      "component": "network-name-gen",
+      "image": "nexus3.onap.org:10001/onap/ccsdk-apps-ms-neng",
+      "version": "1.2.1"
+    },
+    {
+      "container": "oof",
+      "component": "oof",
+      "image": "nexus3.onap.org:10001/onap/optf-osdf",
+      "version": "3.0.6"
+    },
+    {
+      "container": "oof-has-api",
+      "component": "oof-has-api",
+      "image": "nexus3.onap.org:10001/onap/optf-has",
+      "version": "2.2.1"
+    },
+    {
+      "container": "oof-has-api-nginx",
+      "component": "oof-has-api",
+      "image": "docker.nexus.azure.onap.eu/bitnami/nginx",
+      "version": "1.18-debian-10"
+    },
+    {
+      "container": "oof-has-controller",
+      "component": "oof-has-controller",
+      "image": "nexus3.onap.org:10001/onap/optf-has",
+      "version": "2.2.1"
+    },
+    {
+      "container": "oof-has-data",
+      "component": "oof-has-data",
+      "image": "nexus3.onap.org:10001/onap/optf-has",
+      "version": "2.2.1"
+    },
+    {
+      "container": "oof-has-etcd",
+      "component": "oof-has-etcd",
+      "image": "docker.nexus.azure.onap.eu/etcd-amd64",
+      "version": "3.2.24"
+    },
+    {
+      "container": "oof-has-etcd",
+      "component": "oof-has-etcd",
+      "image": "docker.nexus.azure.onap.eu/etcd-amd64",
+      "version": "3.2.24"
+    },
+    {
+      "container": "oof-has-etcd",
+      "component": "oof-has-etcd",
+      "image": "docker.nexus.azure.onap.eu/etcd-amd64",
+      "version": "3.2.24"
+    },
+    {
+      "container": "oof-has-etcd-config",
+      "component": "oof-has-etcd-config",
+      "image": "docker.nexus.azure.onap.eu/bitnami/etcd",
+      "version": "3.3.15"
+    },
+    {
+      "container": "oof-has-reservation",
+      "component": "oof-has-reservation",
+      "image": "nexus3.onap.org:10001/onap/optf-has",
+      "version": "2.2.1"
+    },
+    {
+      "container": "oof-has-solver",
+      "component": "oof-has-solver",
+      "image": "nexus3.onap.org:10001/onap/optf-has",
+      "version": "2.2.1"
+    },
+    {
+      "container": "oom-cert-service",
+      "component": "oom-cert-service",
+      "image": "nexus3.onap.org:10001/onap/org.onap.oom.platform.cert-service.oom-certservice-api",
+      "version": "2.4.0"
+    },
+    {
+      "container": "policy-apex-pdp",
+      "component": "policy-apex-pdp",
+      "image": "nexus3.onap.org:10001/onap/policy-apex-pdp",
+      "version": "2.6.1"
+    },
+    {
+      "container": "policy-api",
+      "component": "policy-api",
+      "image": "nexus3.onap.org:10001/onap/policy-api",
+      "version": "2.5.1"
+    },
+    {
+      "container": "policy-clamp-be",
+      "component": "policy-clamp-be",
+      "image": "nexus3.onap.org:10001/onap/policy-clamp-backend",
+      "version": "6.1.3"
+    },
+    {
+      "container": "policy-clamp-cl-http-ppnt",
+      "component": "policy-clamp-cl-http-ppnt",
+      "image": "nexus3.onap.org:10001/onap/policy-clamp-cl-http-ppnt",
+      "version": "6.1.3"
+    },
+    {
+      "container": "policy-clamp-cl-k8s-ppnt",
+      "component": "policy-clamp-cl-k8s-ppnt",
+      "image": "nexus3.onap.org:10001/onap/policy-clamp-cl-k8s-ppnt",
+      "version": "6.1.3"
+    },
+    {
+      "container": "policy-clamp-cl-pf-ppnt",
+      "component": "policy-clamp-cl-pf-ppnt",
+      "image": "nexus3.onap.org:10001/onap/policy-clamp-cl-pf-ppnt",
+      "version": "6.1.3"
+    },
+    {
+      "container": "policy-clamp-cl-runtime",
+      "component": "policy-clamp-cl-runtime",
+      "image": "nexus3.onap.org:10001/onap/policy-clamp-cl-runtime",
+      "version": "6.1.3"
+    },
+    {
+      "container": "policy-clamp-fe",
+      "component": "policy-clamp-fe",
+      "image": "nexus3.onap.org:10001/onap/policy-clamp-frontend",
+      "version": "6.1.3"
+    },
+    {
+      "container": "onap-policy-clamp-galera-config",
+      "component": "policy-clamp-be-policy-clamp-job",
+      "image": "docker.nexus.azure.onap.eu/mariadb",
+      "version": "10.5.8"
+    },
+    {
+      "container": "policy-distribution",
+      "component": "policy-distribution",
+      "image": "nexus3.onap.org:10001/onap/policy-distribution",
+      "version": "2.6.1"
+    },
+    {
+      "container": "policy-drools-pdp",
+      "component": "policy-drools-pdp",
+      "image": "nexus3.onap.org:10001/onap/policy-pdpd-cl",
+      "version": "1.9.1"
+    },
+    {
+      "container": "onap-policy-galera-db-migrator",
+      "component": "policy-job",
+      "image": "nexus3.onap.org:10001/onap/policy-db-migrator",
+      "version": "2.3.1"
+    },
+    {
+      "container": "policy-gui",
+      "component": "policy-gui",
+      "image": "nexus3.onap.org:10001/onap/policy-gui",
+      "version": "2.1.1"
+    },
+    {
+      "container": "policy-mariadb",
+      "component": "policy-mariadb",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mariadb-galera",
+      "version": "10.5.8"
+    },
+    {
+      "container": "policy-mariadb-metrics",
+      "component": "policy-mariadb",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mysqld-exporter",
+      "version": "0.12.1-debian-10-r264"
+    },
+    {
+      "container": "policy-pap",
+      "component": "policy-pap",
+      "image": "nexus3.onap.org:10001/onap/policy-pap",
+      "version": "2.5.1"
+    },
+    {
+      "container": "policy-xacml-pdp",
+      "component": "policy-xacml-pdp",
+      "image": "nexus3.onap.org:10001/onap/policy-xacml-pdp",
+      "version": "2.5.1"
+    },
+    {
+      "container": "portal-app",
+      "component": "portal-app",
+      "image": "nexus3.onap.org:10001/onap/portal-app",
+      "version": "3.4.2"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "portal-app",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "portal-cassandra",
+      "component": "portal-cassandra",
+      "image": "docker.nexus.azure.onap.eu/bitnami/cassandra",
+      "version": "3.11.9-debian-10-r30"
+    },
+    {
+      "container": "portal-db",
+      "component": "portal-db",
+      "image": "nexus3.onap.org:10001/onap/portal-db",
+      "version": "3.4.1"
+    },
+    {
+      "container": "portal-db-job",
+      "component": "portal-db-job",
+      "image": "docker.nexus.azure.onap.eu/oomk8s/mariadb-client-init",
+      "version": "3.0.0"
+    },
+    {
+      "container": "portal-db-oom-update-job",
+      "component": "portal-db-job",
+      "image": "docker.nexus.azure.onap.eu/oomk8s/mariadb-client-init",
+      "version": "3.0.0"
+    },
+    {
+      "container": "portal-sdk",
+      "component": "portal-sdk",
+      "image": "nexus3.onap.org:10001/onap/portal-sdk",
+      "version": "3.4.2"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "portal-sdk",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "portal-widget",
+      "component": "portal-widget",
+      "image": "nexus3.onap.org:10001/onap/portal-wms",
+      "version": "3.4.2"
+    },
+    {
+      "container": "postgres",
+      "component": "postgres-primary",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "postgres",
+      "component": "postgres-replica",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "robot",
+      "component": "robot",
+      "image": "nexus3.onap.org:10001/onap/testsuite",
+      "version": "1.8.0"
+    },
+    {
+      "container": "sdc-be-job",
+      "component": "sdc-be-job",
+      "image": "nexus3.onap.org:10001/onap/sdc-backend-init",
+      "version": "1.9.5"
+    },
+    {
+      "container": "sdc-be",
+      "component": "sdc-be",
+      "image": "nexus3.onap.org:10001/onap/sdc-backend-all-plugins",
+      "version": "1.9.5"
+    },
+    {
+      "container": "sdc-be-filebeat-onap",
+      "component": "sdc-be",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "sdc-cs-job",
+      "component": "sdc-cs-job",
+      "image": "nexus3.onap.org:10001/onap/sdc-cassandra-init",
+      "version": "1.9.5"
+    },
+    {
+      "container": "sdc-fe",
+      "component": "sdc-fe",
+      "image": "nexus3.onap.org:10001/onap/sdc-frontend",
+      "version": "1.9.5"
+    },
+    {
+      "container": "sdc-fe-filebeat-onap",
+      "component": "sdc-fe",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "sdc-helm-validator",
+      "component": "sdc-helm-validator",
+      "image": "nexus3.onap.org:10001/onap/org.onap.sdc.sdc-helm-validator",
+      "version": "1.2.2"
+    },
+    {
+      "container": "sdc-onboarding-be",
+      "component": "sdc-onboarding-be",
+      "image": "nexus3.onap.org:10001/onap/sdc-onboard-backend",
+      "version": "1.9.5"
+    },
+    {
+      "container": "sdc-onboarding-be-filebeat-onap",
+      "component": "sdc-onboarding-be",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "sdc-onboarding-be-job",
+      "component": "sdc-onboarding-be-job",
+      "image": "nexus3.onap.org:10001/onap/sdc-onboard-cassandra-init",
+      "version": "1.9.5"
+    },
+    {
+      "container": "sdc-wfd-be",
+      "component": "sdc-wfd-be",
+      "image": "nexus3.onap.org:10001/onap/sdc-workflow-backend",
+      "version": "1.7.0"
+    },
+    {
+      "container": "sdc-wfd-be-job",
+      "component": "sdc-wfd-be-job",
+      "image": "nexus3.onap.org:10001/onap/sdc-workflow-init",
+      "version": "1.7.0"
+    },
+    {
+      "container": "sdc-wfd-fe",
+      "component": "sdc-wfd-fe",
+      "image": "nexus3.onap.org:10001/onap/sdc-workflow-frontend",
+      "version": "1.7.0"
+    },
+    {
+      "container": "sdc-wfd-fe-filebeat-onap",
+      "component": "sdc-wfd-fe",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "sdnc",
+      "component": "sdnc",
+      "image": "nexus3.onap.org:10001/onap/sdnc-image",
+      "version": "2.2.2"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "sdnc",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "sdnc-ansible-server",
+      "component": "sdnc-ansible-server",
+      "image": "nexus3.onap.org:10001/onap/sdnc-ansible-server-image",
+      "version": "2.2.2"
+    },
+    {
+      "container": "sdnc",
+      "component": "sdnc-job",
+      "image": "nexus3.onap.org:10001/onap/sdnc-image",
+      "version": "2.2.2"
+    },
+    {
+      "container": "sdnc-dgbuilder",
+      "component": "sdnc-dgbuilder",
+      "image": "nexus3.onap.org:10001/onap/ccsdk-dgbuilder-image",
+      "version": "1.2.2"
+    },
+    {
+      "container": "sdnc-dmaap-listener",
+      "component": "sdnc-dmaap-listener",
+      "image": "nexus3.onap.org:10001/onap/sdnc-dmaap-listener-image",
+      "version": "2.2.2"
+    },
+    {
+      "container": "sdnc-sdnrdb-init-job",
+      "component": "sdnc",
+      "image": "nexus3.onap.org:10001/onap/sdnc-image",
+      "version": "2.2.2"
+    },
+    {
+      "container": "sdnc-ueb-listener",
+      "component": "sdnc-ueb-listener",
+      "image": "nexus3.onap.org:10001/onap/sdnc-ueb-listener-image",
+      "version": "2.2.2"
+    },
+    {
+      "container": "sdnc-web",
+      "component": "sdnc-web",
+      "image": "nexus3.onap.org:10001/onap/sdnc-web-image",
+      "version": "2.2.2"
+    },
+    {
+      "container": "sdnrdb-nginx",
+      "component": "sdnrdb",
+      "image": "docker.nexus.azure.onap.eu/bitnami/nginx",
+      "version": "1.18-debian-10"
+    },
+    {
+      "container": "sdnrdb-elasticsearch",
+      "component": "sdnrdb",
+      "image": "docker.nexus.azure.onap.eu/bitnami/elasticsearch",
+      "version": "7.9.3"
+    },
+    {
+      "container": "sdnrdb-master",
+      "component": "sdnrdb",
+      "image": "docker.nexus.azure.onap.eu/bitnami/elasticsearch",
+      "version": "7.9.3"
+    },
+    {
+      "container": "sdnrdb-master",
+      "component": "sdnrdb",
+      "image": "docker.nexus.azure.onap.eu/bitnami/elasticsearch",
+      "version": "7.9.3"
+    },
+    {
+      "container": "sdnrdb-master",
+      "component": "sdnrdb",
+      "image": "docker.nexus.azure.onap.eu/bitnami/elasticsearch",
+      "version": "7.9.3"
+    },
+    {
+      "container": "so",
+      "component": "so",
+      "image": "nexus3.onap.org:10001/onap/so/api-handler-infra",
+      "version": "1.9.2"
+    },
+    {
+      "container": "so-filebeat-onap",
+      "component": "so",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "so-admin-cockpit",
+      "component": "so-admin-cockpit",
+      "image": "nexus3.onap.org:10001/onap/so/so-admin-cockpit",
+      "version": "1.8.2"
+    },
+    {
+      "container": "so-bpmn-infra",
+      "component": "so-bpmn-infra",
+      "image": "nexus3.onap.org:10001/onap/so/bpmn-infra",
+      "version": "1.9.2"
+    },
+    {
+      "container": "so-bpmn-infra-filebeat-onap",
+      "component": "so-bpmn-infra",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "so-catalog-db-adapter",
+      "component": "so-catalog-db-adapter",
+      "image": "nexus3.onap.org:10001/onap/so/catalog-db-adapter",
+      "version": "1.9.2"
+    },
+    {
+      "container": "so-cnf-adapter",
+      "component": "so-cnf-adapter",
+      "image": "nexus3.onap.org:10001/onap/so/so-cnf-adapter",
+      "version": "1.9.2"
+    },
+    {
+      "container": "so-etsi-nfvo-ns-lcm",
+      "component": "so-etsi-nfvo-ns-lcm",
+      "image": "nexus3.onap.org:10001/onap/so/so-etsi-nfvo-ns-lcm",
+      "version": "1.8.2"
+    },
+    {
+      "container": "so-etsi-sol003-adapter",
+      "component": "so-etsi-sol003-adapter",
+      "image": "nexus3.onap.org:10001/onap/so/so-etsi-sol003-adapter",
+      "version": "1.8.2"
+    },
+    {
+      "container": "so-etsi-sol005-adapter",
+      "component": "so-etsi-sol005-adapter",
+      "image": "nexus3.onap.org:10001/onap/so/so-etsi-sol005-adapter",
+      "version": "1.8.3"
+    },
+    {
+      "container": "so-mariadb-config",
+      "component": "so-mariadb-job",
+      "image": "nexus3.onap.org:10001/mariadb",
+      "version": "10.1.38"
+    },
+    {
+      "container": "so-nssmf-adapter",
+      "component": "so-nssmf-adapter",
+      "image": "nexus3.onap.org:10001/onap/so/so-nssmf-adapter",
+      "version": "1.9.1"
+    },
+    {
+      "container": "so-oof-adapter",
+      "component": "so-oof-adapter",
+      "image": "nexus3.onap.org:10001/onap/so/so-oof-adapter",
+      "version": "1.8.3"
+    },
+    {
+      "container": "so-oof-adapter-filebeat-onap",
+      "component": "so-oof-adapter",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "so-openstack-adapter",
+      "component": "so-openstack-adapter",
+      "image": "nexus3.onap.org:10001/onap/so/openstack-adapter",
+      "version": "1.9.2"
+    },
+    {
+      "container": "so-openstack-adapter-filebeat-onap",
+      "component": "so-openstack-adapter",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "so-request-db-adapter",
+      "component": "so-request-db-adapter",
+      "image": "nexus3.onap.org:10001/onap/so/request-db-adapter",
+      "version": "1.9.2"
+    },
+    {
+      "container": "so-sdc-controller",
+      "component": "so-sdc-controller",
+      "image": "nexus3.onap.org:10001/onap/so/sdc-controller",
+      "version": "1.9.2"
+    },
+    {
+      "container": "so-sdc-controller-filebeat-onap",
+      "component": "so-sdc-controller",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "so-sdnc-adapter",
+      "component": "so-sdnc-adapter",
+      "image": "nexus3.onap.org:10001/onap/so/sdnc-adapter",
+      "version": "1.9.2"
+    },
+    {
+      "container": "so-sdnc-adapter-filebeat-onap",
+      "component": "so-sdnc-adapter",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "create-tls-secret",
+      "component": "so-tls-cert",
+      "image": "docker.nexus.azure.onap.eu/bitnami/kubectl",
+      "version": "1.19"
+    },
+    {
+      "container": "uui",
+      "component": "uui",
+      "image": "nexus3.onap.org:10001/onap/usecase-ui",
+      "version": "4.0.5"
+    },
+    {
+      "container": "uui-server",
+      "component": "uui-server",
+      "image": "nexus3.onap.org:10001/onap/usecase-ui-server",
+      "version": "4.0.5"
+    },
+    {
+      "container": "vfc-generic-vnfm-driver",
+      "component": "vfc-generic-vnfm-driver",
+      "image": "nexus3.onap.org:10001/onap/vfc/gvnfmdriver",
+      "version": "1.4.3"
+    },
+    {
+      "container": "vfc-generic-vnfm-driver-filebeat-onap",
+      "component": "vfc-generic-vnfm-driver",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "vfc-huawei-vnfm-driver",
+      "component": "vfc-huawei-vnfm-driver",
+      "image": "nexus3.onap.org:10001/onap/vfc/nfvo/svnfm/huawei",
+      "version": "1.3.9"
+    },
+    {
+      "container": "vfc-huawei-vnfm-driver-filebeat-onap",
+      "component": "vfc-huawei-vnfm-driver",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "vfc-nslcm",
+      "component": "vfc-nslcm",
+      "image": "nexus3.onap.org:10001/onap/vfc/nslcm",
+      "version": "1.4.4"
+    },
+    {
+      "container": "vfc-nslcm-filebeat-onap",
+      "component": "vfc-nslcm",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "vfc-redis",
+      "component": "vfc-redis",
+      "image": "nexus3.onap.org:10001/onap/vfc/db",
+      "version": "1.3.5"
+    },
+    {
+      "container": "vfc-vnflcm",
+      "component": "vfc-vnflcm",
+      "image": "nexus3.onap.org:10001/onap/vfc/vnflcm",
+      "version": "1.4.2"
+    },
+    {
+      "container": "vfc-vnflcm-filebeat-onap",
+      "component": "vfc-vnflcm",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "vfc-vnfmgr",
+      "component": "vfc-vnfmgr",
+      "image": "nexus3.onap.org:10001/onap/vfc/vnfmgr",
+      "version": "1.4.1"
+    },
+    {
+      "container": "vfc-vnfmgr-filebeat-onap",
+      "component": "vfc-vnfmgr",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "vfc-vnfres",
+      "component": "vfc-vnfres",
+      "image": "nexus3.onap.org:10001/onap/vfc/vnfres",
+      "version": "1.4.0"
+    },
+    {
+      "container": "vfc-vnfres-filebeat-onap",
+      "component": "vfc-vnfres",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "vfc-zte-vnfm-driver",
+      "component": "vfc-zte-vnfm-driver",
+      "image": "nexus3.onap.org:10001/onap/vfc/ztevnfmdriver",
+      "version": "1.4.1"
+    },
+    {
+      "container": "vfc-zte-vnfm-driver-filebeat-onap",
+      "component": "vfc-zte-vnfm-driver",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "vid",
+      "component": "vid",
+      "image": "nexus3.onap.org:10001/onap/vid",
+      "version": "8.0.2"
+    },
+    {
+      "container": "filebeat-onap",
+      "component": "vid",
+      "image": "docker.nexus.azure.onap.eu/beats/filebeat",
+      "version": "5.5.0"
+    },
+    {
+      "container": "vid-mariadb-init",
+      "component": "vid-mariadb-init",
+      "image": "docker.nexus.azure.onap.eu/bitnami/mariadb",
+      "version": "10.5.8"
+    },
+    {
+      "container": "vnfsdk",
+      "component": "vnfsdk",
+      "image": "nexus3.onap.org:10001/onap/vnfsdk/refrepo",
+      "version": "1.6.3"
+    },
+    {
+      "container": "vnfsdk-job",
+      "component": "vnfsdk-job",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "vnfsdk-postgres",
+      "component": "vnfsdk-postgres-primary",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    },
+    {
+      "container": "vnfsdk-postgres",
+      "component": "vnfsdk-postgres-replica",
+      "image": "docker.nexus.azure.onap.eu/crunchydata/crunchy-postgres",
+      "version": "centos8-13.2-4.6.1"
+    }
+  ]

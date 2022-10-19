@@ -1,0 +1,7 @@
+---
+- hosts: kube-master
+  run_once: "yes"
+  vars_files:
+    - "vars/pdf.yml"
+  roles:
+    - xtesting-onap-security

@@ -1,0 +1,8 @@
+---
+- hosts: kube-master
+  run_once: "yes"
+  vars_files:
+    - "vars/pdf.yml"
+    - "vars/cluster.yml"
+  roles:
+    - xtesting-healthcheck-k8s

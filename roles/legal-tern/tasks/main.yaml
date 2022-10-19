@@ -1,0 +1,90 @@
+---
+- name: "Install tern prerequisites"
+  become: yes
+  ansible.builtin.apt:
+    name:
+      - attr
+      - fuse-overlayfs
+      - python3-venv
+      - jq
+    state: latest
+
+- name: "Install pip dependencies"
+  become: yes
+  ansible.builtin.pip:
+    name:
+      - wheel
+      - lftools
+    state: latest
+
+- name: "Set variables for tern run"
+  ansible.builtin.set_fact:
+    tern_output: "/tmp/tern/archives/{{ run_tiers }}/{{ run_type }}"
+    tern_archives: "/tmp/tern"
+    tern_k8_namespace: "onap"
+
+- name: "Delete directory with/for results"
+  become: yes
+  ansible.builtin.file:
+    path: "{{ tern_output }}"
+    state: absent
+
+- name: "Copy tern script"
+  ansible.builtin.copy:
+    src: scripts/run_tern.sh
+    dest: "{{ ansible_user_dir }}/run_tern.sh"
+    mode: '500'
+
+- name: "Copy netrc for lftool"
+  ansible.builtin.template:
+    src: .netrc.j2
+    dest: "{{ ansible_user_dir }}/.netrc"
+    mode: 0600
+
+- name: "Create directory for results"
+  become: yes
+  ansible.builtin.file:
+    path: "{{ tern_output }}"
+    state: directory
+    mode: '0700'
+    recurse: yes
+    owner: "{{ ansible_user }}"
+
+- name: "Add fuse group"
+  become: yes
+  ansible.builtin.group:
+    name: "fuse"
+    state: present
+    system: yes
+
+- name: "Add user to fuse group"
+  become: yes
+  ansible.builtin.user:
+    append: yes
+    groups: fuse
+    user: "{{ ansible_user }}"
+
+- name: "Launch tern analysis & push artifacts"
+  become: no
+  ansible.builtin.shell:
+    cmd: "{{ ansible_user_dir }}/run_tern.sh > {{ tern_output }}/run_tern.log"
+    chdir: "{{ tern_output }}"
+  environment:
+    LF_RESULTS_BACKUP: '{{ lf_results_backup }}'
+    POD: '{{ pod }}'
+    CI_PIPELINE_CREATED_AT: '{{ ci_pipeline_created_at }}'
+    TERN_LOCATION: '{{ ansible_user_dir }}'
+    K8NAMESPACE: '{{ tern_k8_namespace }}'
+    ARCHIVES_LOCATION: '{{ tern_archives }}'
+  async: 259200 # 60*60*24*3 = 3 days
+  poll: 0 # dont wait for it
+  register: tern_analysis
+
+- name: "Check if tern analysis is running"
+  become: no
+  async_status:
+    jid: "{{ tern_analysis.ansible_job_id }}"
+  register: tern_result
+  until: tern_result.started
+  retries: 10
+  delay: 10

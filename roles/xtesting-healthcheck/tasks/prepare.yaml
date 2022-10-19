@@ -1,0 +1,52 @@
+---
+- name: create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  loop:
+    - "{{ exec_local_path }}/"
+    - "{{ ansible_user_dir }}/oom/{{ onap_version }}/{{ run_tiers }}/"
+
+- name: create directories as root
+  become: yes
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  loop:
+    - "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+
+- name: Delete healthcheck job
+  community.kubernetes.k8s:
+    state: absent
+    api: batch/v1
+    kind: Job
+    namespace: onap
+    name: "integration-onap-{{ run_type }}"
+    kubeconfig: "{{ global_local_path }}/{{ kube_conf_file }}"
+
+- name: Delete old logs
+  become: yes
+  ansible.builtin.file:
+    state: absent
+    path: "{{ res_local_path }}/{{ run_tiers }}/{{ run_type }}"
+
+- name: Override docker version for CPS (python3 migration)
+  ansible.builtin.set_fact:
+    testing_container:
+      "nexus3.onap.org:10003/onap/xtesting-smoke-usecases-robot-py3"
+  when: (run_type == "cps-healthcheck") or
+        (run_type == "cps-temporal-healthcheck") or
+        (run_type == "cps-dmi-plugin-healthcheck")
+
+- name: save healthcheck deployment to file
+  ansible.builtin.copy:
+    content: "{{ healthcheck_deployment | to_nice_yaml }}"
+    dest: "{{ k8s_job__dir_path }}/healthcheck-{{ run_type }}.yaml"
+
+- name: save secret for S3 to file
+  ansible.builtin.copy:
+    content: "{{ healthcheck_secret | to_nice_yaml }}"
+    dest: "{{ k8s_job__dir_path }}/s3-keys-{{ run_type }}.yaml"
+  when: use_s3 | bool

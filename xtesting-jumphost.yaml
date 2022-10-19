@@ -1,0 +1,5 @@
+---
+# file: webservers.yml
+- hosts: kube-master
+  roles:
+    - xtesting-jumphost
