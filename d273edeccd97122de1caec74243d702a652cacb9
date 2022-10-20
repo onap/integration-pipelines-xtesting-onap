@@ -1,0 +1,7 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+2: Michal Jagiello <michal.jagiello@t-mobile.pl>
+Submitted-by: Michal Jagiello <michal.jagiello@t-mobile.pl>
+Submitted-at: Thu, 20 Oct 2022 13:30:03 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/integration/pipelines/xtesting-onap/+/131565
+Project: integration/pipelines/xtesting-onap
+Branch: refs/heads/master
